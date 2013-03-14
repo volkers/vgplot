@@ -9,11 +9,14 @@
   "Start gnuplot process and returns stream to gnuplot"
   (do-execute "gnuplot" nil))
 
-(defun close-plot (g-stream)
-  "Close gnuplot process/stream connected by g-stream."
-  (when g-stream
-    (format g-stream "quit~%")
-    (close g-stream)))
+(defun close-plot ()
+  "Close gnuplot from *active-plot*"
+  (when *active-plot*
+    (let ((g-stream (plot-stream *active-plot*)))
+      (format g-stream "quit~%")
+      (force-output g-stream)
+      (close g-stream)
+      (setf *active-plot* (pop *plots*)))))
 
 (defclass plot-class ()
   ((stream-fd :reader plot-stream
@@ -25,23 +28,8 @@
 (defun plot (x y)
   (unless *active-plot*
     (setf *active-plot* (make-plot)))
-  (format (plot-stream *active-plot*) "plot '-' using 1:2~%")
+  (format (plot-stream *active-plot*) "plot '-' with lines using 1:2~%")
   (map 'vector #'(lambda (a b) (format (plot-stream *active-plot*) "~A ~A~%" a b)) x y)
   (format (plot-stream *active-plot*) "e~%")
   (force-output (plot-stream *active-plot*)))
-  
-;; plot '-' using 1:2
-;;         1 10
-;;         2 20
-;;         3 32
-;;         4 40
-;;         5 50
-;;         e
-  ;; plotting
-
-
-
-;; example:
-;; (format...)
-;; (force-output g-stream))
 
