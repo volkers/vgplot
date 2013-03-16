@@ -8,6 +8,11 @@
 
 (let ((stream-list nil) ; List holding the streams of not active plots
       (stream nil)) ; Stream of the active plot
+  (defun format-plot (text &rest args)
+    "Format directly to active gnuplot process"
+    (when stream
+      (apply #'format stream text args)
+      (force-output stream)))
   (defun close-plot ()
     "Close connected gnuplot"
     (when stream
@@ -16,6 +21,7 @@
       (close stream)
       (setf stream (pop stream-list))))
   (defun plot (x y)
+    "Plot x,y to active plot, create plot if needed."
     (unless stream
       (setf stream (open-plot)))
     (format stream "plot '-' with lines using 1:2~%")
