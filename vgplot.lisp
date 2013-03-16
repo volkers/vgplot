@@ -2,34 +2,30 @@
 
 (in-package #:vgplot)
 
-(defvar *plots* nil "List holding the identifiers of the plots")
-(defvar *active-plot* nil "Identifier of the active plot")
-
 (defun open-plot ()
-  "Start gnuplot process and returns stream to gnuplot"
+  "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
 
-(defun close-plot ()
-  "Close gnuplot from *active-plot*"
-  (when *active-plot*
-    (let ((g-stream (plot-stream *active-plot*)))
-      (format g-stream "quit~%")
-      (force-output g-stream)
-      (close g-stream)
-      (setf *active-plot* (pop *plots*)))))
+(let ((stream-list nil) ; List holding the streams of not active plots
+      (stream nil)) ; Stream of the active plot
+  (defun close-plot ()
+    "Close connected gnuplot"
+    (when stream
+      (format stream "quit~%")
+      (force-output stream)
+      (close stream)
+      (setf stream (pop stream-list))))
+  (defun plot (x y)
+    (unless stream
+      (setf stream (open-plot)))
+    (format stream "plot '-' with lines using 1:2~%")
+    (map 'vector #'(lambda (a b) (format stream "~A ~A~%" a b)) x y)
+    (format stream "e~%")
+    (force-output stream)))
 
-(defclass plot-class ()
-  ((stream-fd :reader plot-stream
-              :initarg :stream-fd)))
+(defun test ()
+  (let ((x #(0 1 2 3))
+        (y #(0 2 -1 3)))
+    (plot x y)))
 
-(defun make-plot ()
-  (make-instance 'plot-class :stream-fd (open-plot)))
-
-(defun plot (x y)
-  (unless *active-plot*
-    (setf *active-plot* (make-plot)))
-  (format (plot-stream *active-plot*) "plot '-' with lines using 1:2~%")
-  (map 'vector #'(lambda (a b) (format (plot-stream *active-plot*) "~A ~A~%" a b)) x y)
-  (format (plot-stream *active-plot*) "e~%")
-  (force-output (plot-stream *active-plot*)))
-
+        

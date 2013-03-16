@@ -3,4 +3,4 @@
 (defpackage #:vgplot
   (:use :cl)
   (:import-from :ltk :do-execute)
-  (:export :open-plot :close-plot :plot))
+  (:export :close-plot :plot :test))
