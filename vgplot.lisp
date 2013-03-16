@@ -29,9 +29,27 @@
     (format stream "e~%")
     (force-output stream)))
 
+
+;; utilities and tests 
+(defun range (a &optional b (step 1))
+  "Return vector of values in a certain range:
+\(range limit\) return natural numbers below limit
+\(range start limit\) return ordinary numbers starting with start below limit
+\(range start limit step\) return numbers starting with start, successively adding step untill reaching limit \(excluding\)"
+  (apply 'vector (let ((start)
+                       (limit))
+                   (if b
+                       (setf start a
+                             limit b)
+                       (setf start 0
+                             limit a))
+                   (if (> limit start)
+                       (loop for i from start below limit by step collect i)
+                       (loop for i from start above limit by step collect i)))))
+
 (defun test ()
-  (let ((x #(0 1 2 3))
-        (y #(0 2 -1 3)))
+  (let* ((x (range 0 (* 2 pi) 0.01))
+         (y (map 'vector #'sin x)))
     (plot x y)))
 
         
