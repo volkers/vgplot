@@ -38,10 +38,14 @@
       (force-output stream)
       (close stream)
       (setf stream (pop stream-list))))
-  (defun plot (x y)
+  (defun plot (x y &optional &key title (grid t))
     "Plot x,y to active plot, create plot if needed."
     (unless stream
       (setf stream (open-plot)))
+    (when grid
+      (format stream "set grid~%"))
+    (when title
+      (format stream "set title '~a'~%" title))
     (format stream "plot '-' with lines using 1:2~%")
     (map 'vector #'(lambda (a b) (format stream "~A ~A~%" a b)) x y)
     (format stream "e~%")
@@ -68,6 +72,4 @@
 (defun test ()
   (let* ((x (range 0 (* 2 pi) 0.01))
          (y (map 'vector #'sin x)))
-    (plot x y)))
-
-        
+    (plot x y :title "y = sin(x)")))
