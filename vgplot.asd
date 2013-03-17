@@ -4,7 +4,7 @@
   :serial t
   :description "Interface to gnuplot"
   :author "Volker Sarodnick <volkersar@gmx.net>"
-  :license "LGPL"
+  :license "GPL"
   :depends-on (:ltk)
   :components ((:file "package")
                (:file "vgplot")))
