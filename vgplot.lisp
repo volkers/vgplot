@@ -42,8 +42,9 @@
     "Plot x,y to active plot, create plot if needed."
     (unless stream
       (setf stream (open-plot)))
-    (when grid
-      (format stream "set grid~%"))
+    (if grid
+      (format stream "set grid~%")
+      (format stream "unset grid~%"))
     (when title
       (format stream "set title '~a'~%" title))
     (format stream "plot '-' with lines using 1:2~%")
@@ -70,6 +71,14 @@
                        (loop for i from start above limit by step collect i)))))
 
 (defun test ()
-  (let* ((x (range 0 (* 2 pi) 0.01))
-         (y (map 'vector #'sin x)))
-    (plot x y :title "y = sin(x)")))
+  (let ((x (range 0 (* 2 pi) 0.01))
+        (y))
+    (setf y (map 'vector #'sin x))
+    (plot x y  :title "y = sin(x)")
+    (format t "Press ENTER for next plot.~%")
+    (read-line)
+    (setf y (map 'vector #'cos x))
+    (plot x y :title "y = cos(x) (grid off)" :grid nil)
+    (format t "Press ENTER for (close-plot).~%")
+    (read-line)
+    (close-plot)))
