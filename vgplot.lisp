@@ -38,6 +38,16 @@
       (force-output stream)
       (close stream)
       (setf stream (pop stream-list))))
+  (defun close-all-plots ()
+    "Close all connected gnuplots"
+    (close-plot)
+    (when stream
+      (close-all-plots)))
+  (defun new-plot ()
+    "Add a new plot window to a current one."
+    (when stream
+      (push stream stream-list)
+      (setf stream (open-plot))))
   (defun plot (x y &optional &key title (grid t))
     "Plot x,y to active plot, create plot if needed."
     (unless stream
@@ -74,11 +84,16 @@
   (let ((x (range 0 (* 2 pi) 0.01))
         (y))
     (setf y (map 'vector #'sin x))
-    (plot x y  :title "y = sin(x)")
+    (plot x y  :title "y = sin(x) (plot x y)")
     (format t "Press ENTER for next plot.~%")
     (read-line)
     (setf y (map 'vector #'cos x))
-    (plot x y :title "y = cos(x) (grid off)" :grid nil)
-    (format t "Press ENTER for (close-plot).~%")
+    (plot x y :title "y = cos(x)~%(plot x y :grid nil)" :grid nil)
+    (format t "Press ENTER for new plot.~%")
     (read-line)
-    (close-plot)))
+    (new-plot)
+    (setf y (map 'vector #'(lambda (a) (sin (* 2 a)))  x))
+    (plot x y :title "y = cos(2x) (new-plot) (plot x y)")
+    (format t "Press ENTER for (close-all-plots).~%")
+    (read-line)
+    (close-all-plots)))
