@@ -1,0 +1,17 @@
+# vgplot
+
+This common lisp library is an interface to the gnuplot utility.
+
+## Usage
+
+(asdf:load-system :vgplot)
+
+(vgplot:plot x y :title "plot")
+
+For examples see the test function in vgplot.lisp.
+
+## License
+
+Copyright (C) 2012 Volker Sarodnick
+
+GNU General Public License
