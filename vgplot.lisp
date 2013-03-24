@@ -56,6 +56,9 @@
     "Plot x,y to active plot, create plot if needed."
     (unless stream
       (setf stream (open-plot)))
+    (unless (vectorp x)
+      (setf x (coerce x 'vector)
+            y (coerce y 'vector)))
     (if grid
       (format stream "set grid~%")
       (format stream "unset grid~%"))
