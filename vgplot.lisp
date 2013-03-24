@@ -24,6 +24,10 @@
   "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
 
+(defun convert-newline (s)
+  "Convert lisp newlines to gnuplot style"
+  (regex-replace-all "~%" s "\\n"))
+
 (let ((stream-list nil) ; List holding the streams of not active plots
       (stream nil)) ; Stream of the active plot
   (defun format-plot (text &rest args)
@@ -56,7 +60,7 @@
       (format stream "set grid~%")
       (format stream "unset grid~%"))
     (when title
-      (format stream "set title '~a'~%" title))
+      (format stream "set title \"~a\"~%" (convert-newline title)))
     (format stream "plot '-' with lines using 1:2~%")
     (map 'vector #'(lambda (a b) (format stream "~A ~A~%" a b)) x y)
     (format stream "e~%")
@@ -84,7 +88,7 @@
   (let ((x (range 0 (* 2 pi) 0.01))
         (y))
     (setf y (map 'vector #'sin x))
-    (plot x y  :title "y = sin(x) (plot x y)")
+    (plot x y  :title "y = sin(x)~%(plot x y)")
     (format t "Press ENTER for next plot.~%")
     (read-line)
     (setf y (map 'vector #'cos x))
@@ -93,7 +97,7 @@
     (read-line)
     (new-plot)
     (setf y (map 'vector #'(lambda (a) (sin (* 2 a)))  x))
-    (plot x y :title "y = cos(2x) (new-plot) (plot x y)")
+    (plot x y :title "y = cos(2x)~%(new-plot)~%(plot x y)")
     (format t "Press ENTER for (close-all-plots).~%")
     (read-line)
     (close-all-plots)))
