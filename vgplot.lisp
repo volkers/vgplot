@@ -24,12 +24,26 @@
   "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
 
-(defun convert-newline (s)
-  "Convert lisp newlines to gnuplot style"
-  (regex-replace-all "~%" s "\\n"))
+(defun vectorize (vals)
+  "Coerce all sequences except strings to vectors"
+  (mapcar #'(lambda (x) (if (stringp x)
+                            x
+                            (coerce x 'vector)))
+          vals))
+
+(defun parse-vals (vals)
+  "Parse input values to plot and return grouped list: ((x y lbl-string) (x1 y1 lbl-string)...)"
+  (cond
+    ((stringp (third vals)) (cons (list (first vals) (second vals) (third vals))
+                                  (parse-vals (cdddr vals))))
+    ((second vals) (cons (list (first vals) (second vals) "")
+                         (parse-vals (cddr vals))))
+    (vals (list (list (first vals) nil ""))) ;; special case of plot val to index, i.e. only y exist
+    (t nil)))
 
 (let ((stream-list nil) ; List holding the streams of not active plots
-      (stream nil)) ; Stream of the active plot
+      (stream nil) ; Stream of the active plot
+      (tmp-file-names nil)) ; list of temporary filenames
   (defun format-plot (text &rest args)
     "Format directly to active gnuplot process"
     (when stream
@@ -41,7 +55,11 @@
       (format stream "quit~%")
       (force-output stream)
       (close stream)
-      (setf stream (pop stream-list))))
+      (setf stream (pop stream-list)))
+    (when tmp-file-names
+      (loop for name in tmp-file-names do
+           (delete-file name))
+      (setf tmp-file-names nil)))
   (defun close-all-plots ()
     "Close all connected gnuplots"
     (close-plot)
@@ -51,24 +69,43 @@
     "Add a new plot window to a current one."
     (when stream
       (push stream stream-list)
-      (setf stream (open-plot))))
-  (defun plot (x y &optional &key title (grid t))
-    "Plot x,y to active plot, create plot if needed."
+      (setf stream (open-plot)))
+    (when tmp-file-names
+      (loop for name in tmp-file-names do
+           (delete-file name))
+      (setf tmp-file-names nil)))
+  (defun plot (&rest vals)
+    "Plot y = f(x) on active plot, create plot if needed.
+vals could be: y                  plot y over its index
+               x y                plot y = f(x)
+               x y lable-string   plot y = f(x) using lable-string as label
+               following parameters add plots e.g.:
+               x y label x1 y1 label1 ..."
     (unless stream
       (setf stream (open-plot)))
-    (unless (vectorp x)
-      (setf x (coerce x 'vector)
-            y (coerce y 'vector)))
-    (if grid
+    (when tmp-file-names
+      (loop for name in tmp-file-names do
+           (delete-file name))
+      (setf tmp-file-names nil))
+    ;; todo: how to always delete temp files?
+    (let ((val-l (parse-vals (vectorize vals)))
+          (plt-cmd nil))
+      (loop for pl in val-l do
+           (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+                   (if (null (second pl)) ;; special case plotting to index
+                       (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
+                       (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
+                                          (first pl) (second pl))))
+                 tmp-file-names)
+           (setf plt-cmd (concatenate 'string (if plt-cmd
+                                                  (concatenate 'string plt-cmd ", ")
+                                                  "plot ")
+                                      (format nil "\"~A\" with lines title \"~A\" "
+                                              (first tmp-file-names) (third pl)))))
       (format stream "set grid~%")
-      (format stream "unset grid~%"))
-    (when title
-      (format stream "set title \"~a\"~%" (convert-newline title)))
-    (format stream "plot '-' with lines using 1:2~%")
-    (map 'vector #'(lambda (a b) (format stream "~A ~A~%" a b)) x y)
-    (format stream "e~%")
-    (force-output stream)))
-
+      (format stream "~A~%" plt-cmd)
+      (force-output stream))
+    t))
 
 ;; utilities and tests 
 (defun range (a &optional b (step 1))
@@ -89,18 +126,23 @@
 
 (defun test ()
   (let ((x (range 0 (* 2 pi) 0.01))
-        (y))
+        (y)
+        (z))
     (setf y (map 'vector #'sin x))
-    (plot x y  :title "y = sin(x)~%(plot x y)")
+    (plot x y  "y = sin(x)")
+    (format t "(plot x y  \"y = sin(x)\")~%")
     (format t "Press ENTER for next plot.~%")
     (read-line)
-    (setf y (map 'vector #'cos x))
-    (plot x y :title "y = cos(x)~%(plot x y :grid nil)" :grid nil)
+    (setf z (map 'vector #'cos x))
+    (format t "(plot x y \"y = sin(x)\" x z \"y = cos(x)\"~%")
+    (plot x y "y = sin(x)" x z "y = cos(x)")
     (format t "Press ENTER for new plot.~%")
     (read-line)
     (new-plot)
     (setf y (map 'vector #'(lambda (a) (sin (* 2 a)))  x))
-    (plot x y :title "y = cos(2x)~%(new-plot)~%(plot x y)")
+    (format t "(new-plot)~%")
+    (format t "(plot x y \"y = cos(2x) (new-plot)\"~%")
+    (plot x y "y = cos(2x) (new-plot)")
     (format t "Press ENTER for (close-all-plots).~%")
     (read-line)
     (close-all-plots)))
