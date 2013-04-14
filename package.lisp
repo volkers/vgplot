@@ -3,5 +3,6 @@
 (defpackage #:vgplot
   (:use :cl)
   (:import-from :ltk :do-execute)
+  (:import-from :cl-ppcre :regex-replace-all)
   (:import-from :cl-fad :with-output-to-temporary-file)
-  (:export :format-plot :close-plot :close-all-plots :new-plot :plot :test :range))
+  (:export :format-plot :close-plot :close-all-plots :new-plot :plot :demo :range))

@@ -9,7 +9,9 @@ utility.
 
 (vgplot:plot '(1 2 3) '(0 -2 17) "silly example")
 
-For examples see the test function in vgplot.lisp.
+For examples run the demo function in vgplot.lisp:
+
+(vgplot:demo)
 
 ## License
 
