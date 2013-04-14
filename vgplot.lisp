@@ -34,10 +34,10 @@
 (defun parse-vals (vals)
   "Parse input values to plot and return grouped list: ((x y lbl-string) (x1 y1 lbl-string)...)"
   (cond
-    ((stringp (third vals)) (cons (list (first vals) (second vals) (third vals))
-                                  (parse-vals (cdddr vals))))
-    ((second vals) (cons (list (first vals) (second vals) "")
-                         (parse-vals (cddr vals))))
+    ((stringp (third vals)) (cons (list (pop vals) (pop vals) (pop vals))
+                                  (parse-vals vals)))
+    ((second vals) (cons (list (pop vals) (pop vals) "")
+                         (parse-vals vals)))
     (vals (list (list (first vals) nil ""))) ;; special case of plot val to index, i.e. only y exist
     (t nil)))
 
