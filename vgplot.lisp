@@ -41,6 +41,14 @@
     (vals (list (list (first vals) nil ""))) ;; special case of plot val to index, i.e. only y exist
     (t nil)))
 
+(defun del-tmp-files (tmp-file-list)
+  "Delete files in tmp-file-list and return nil"
+  (when tmp-file-list
+    (loop for name in tmp-file-list do
+         (delete-file name)))
+  nil)
+
+
 (let ((stream-list nil) ; List holding the streams of not active plots
       (stream nil) ; Stream of the active plot
       (tmp-file-names nil)) ; list of temporary filenames
@@ -56,10 +64,7 @@
       (force-output stream)
       (close stream)
       (setf stream (pop stream-list)))
-    (when tmp-file-names
-      (loop for name in tmp-file-names do
-           (delete-file name))
-      (setf tmp-file-names nil)))
+    (setf tmp-file-names (del-tmp-files tmp-file-names)))
   (defun close-all-plots ()
     "Close all connected gnuplots"
     (close-plot)
@@ -70,10 +75,7 @@
     (when stream
       (push stream stream-list)
       (setf stream (open-plot)))
-    (when tmp-file-names
-      (loop for name in tmp-file-names do
-           (delete-file name))
-      (setf tmp-file-names nil)))
+    (setf tmp-file-names (del-tmp-files tmp-file-names)))
   (defun plot (&rest vals)
     "Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
@@ -83,10 +85,7 @@ vals could be: y                  plot y over its index
                x y label x1 y1 label1 ..."
     (unless stream
       (setf stream (open-plot)))
-    (when tmp-file-names
-      (loop for name in tmp-file-names do
-           (delete-file name))
-      (setf tmp-file-names nil))
+    (setf tmp-file-names (del-tmp-files tmp-file-names))
     ;; todo: how to always delete temp files?
     (let ((val-l (parse-vals (vectorize vals)))
           (plt-cmd nil))
