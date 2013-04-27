@@ -106,7 +106,25 @@ vals could be: y                  plot y over its index
       (force-output stream))
     t))
 
-;; utilities and tests 
+;; utilities and tests
+(defun drop-substring (substring instring)
+  (let ((i 0)
+        (ilen (length substring))
+        (chars))
+    (loop for c across instring do
+         (if (char= c (aref substring i))
+             (incf i)
+             (if (= i 0)
+                 (push c chars)
+                 (progn
+                   (loop for j below i do
+                        (push (aref substring j) chars))
+                   (push c chars)
+                   (setf i 0))))
+         (if (= i ilen)
+             (setf i 0)))
+    (coerce (nreverse chars) 'string)))
+
 (defun range (a &optional b (step 1))
   "Return vector of values in a certain range:
 \(range limit\) return natural numbers below limit
@@ -127,9 +145,7 @@ vals could be: y                  plot y over its index
   (let ((quoted-cmd (gensym)))
     `(let ((,quoted-cmd ',cmd))
        ;; remove "vgplot::", the arrays shouldn't have package qualifier:
-       (princ (cl-ppcre:regex-replace-all "vgplot::" 
-                                          (format nil "~s" ,quoted-cmd)
-                                          ""))
+       (princ (drop-substring "vgplot::" (format nil "~s" ,quoted-cmd)))
        (read-line)
        ,cmd)))
 
