@@ -106,7 +106,28 @@ vals could be: y                  plot y over its index
       (force-output stream))
     t))
 
-;; utilities and tests
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; exported utilities
+
+(defun range (a &optional b (step 1))
+  "Return vector of values in a certain range:
+\(range limit\) return natural numbers below limit
+\(range start limit\) return ordinary numbers starting with start below limit
+\(range start limit step\) return numbers starting with start, successively adding step untill reaching limit \(excluding\)"
+  (apply 'vector (let ((start)
+                       (limit))
+                   (if b
+                       (setf start a
+                             limit b)
+                       (setf start 0
+                             limit a))
+                   (if (> limit start)
+                       (loop for i from start below limit by step collect i)
+                       (loop for i from start above limit by step collect i)))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;; utilities for demo and demo
+
 (defun drop-substring (substring instring)
   (let ((i 0)
         (ilen (length substring))
@@ -125,42 +146,29 @@ vals could be: y                  plot y over its index
              (setf i 0)))
     (coerce (nreverse chars) 'string)))
 
-(defun range (a &optional b (step 1))
-  "Return vector of values in a certain range:
-\(range limit\) return natural numbers below limit
-\(range start limit\) return ordinary numbers starting with start below limit
-\(range start limit step\) return numbers starting with start, successively adding step untill reaching limit \(excluding\)"
-  (apply 'vector (let ((start)
-                       (limit))
-                   (if b
-                       (setf start a
-                             limit b)
-                       (setf start 0
-                             limit a))
-                   (if (> limit start)
-                       (loop for i from start below limit by step collect i)
-                       (loop for i from start above limit by step collect i)))))
-
-(defmacro print-n-run (cmd)
-  (let ((quoted-cmd (gensym)))
-    `(let ((,quoted-cmd ',cmd))
-       ;; remove "vgplot::", the arrays shouldn't have package qualifier:
-       (princ (drop-substring "vgplot::" (format nil "~s" ,quoted-cmd)))
-       (read-line)
-       ,cmd)))
+(defun print-n-run-list (lst)
+  "Print commands in lst and run them after a (read-line)"
+  (loop for cmd in lst do
+       (progn (princ (drop-substring "vgplot::" (format nil "~s" cmd)))
+              (read-line)
+              (eval cmd))))
 
 (defun demo ()
-  (let ((*print-case* :downcase)
-        (x) (y) (z))
+  (let ((*print-case* :downcase))
     (format t "****************************************************************~%")
     (format t "vgplot demo, run commands by pressing RETURN~%")
     (format t "****************************************************************~%")
-    (print-n-run (setf x (range 0 (* 2 pi) 0.01)))
-    (print-n-run (setf y (map 'vector #'sin x)))
-    (print-n-run (plot x y "y = sin(x)"))
-    (print-n-run (setf z (map 'vector #'cos x)))
-    (print-n-run (plot x y "y = sin(x)" x z "y = cos(x)"))
-    (print-n-run (new-plot))
-    (print-n-run (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x)))
-    (print-n-run (plot x y "y = cos(2x) (new-plot)"))
-    (print-n-run (close-all-plots))))
+    (print-n-run-list
+     '( ;; add demo commands here
+       (defvar x)
+       (defvar y)
+       (setf x (range 0 (* 2 pi) 0.01))
+       (setf y (map 'vector #'sin x))
+       (plot x y "y = sin(x)")
+       (defvar z)
+       (setf z (map 'vector #'cos x))
+       (plot x y "y = sin(x)" x z "y = cos(x)")
+       (new-plot)
+       (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
+       (plot x y "y = cos(2x) (new-plot)")
+       (close-all-plots)))))
