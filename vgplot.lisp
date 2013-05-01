@@ -41,6 +41,27 @@
     (vals (list (list (first vals) nil ""))) ;; special case of plot val to index, i.e. only y exist
     (t nil)))
 
+(defun parse-label (lbl)
+  "Parse label string e.g. \"-k;label;\" and return accordinggnuplot style command string."
+  (let ((style "lines")
+        (color "red")
+        (title "")
+        (start-title (search ";" lbl))
+        (end-title (search ";" lbl :from-end t)))
+    (setf title (subseq lbl (1+ start-title) end-title))
+    (when (> start-title 0)
+      (loop for c across (subseq lbl 0 start-title) do
+           (ecase c
+             (#\- (setf style "lines"))
+             (#\. (setf style "dots"))
+             (#\+ (setf style "points"))
+             (#\r (setf color "red"))
+             (#\g (setf color "green"))
+             (#\b (setf color "blue"))
+             (#\c (setf color "cyan"))
+             (#\k (setf color "black")))))
+    (format nil "with ~A linecolor rgb \"~A\" title \"~A\" " style color title)))
+
 (defun del-tmp-files (tmp-file-list)
   "Delete files in tmp-file-list and return nil"
   (when tmp-file-list
@@ -99,8 +120,8 @@ vals could be: y                  plot y over its index
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
-                                      (format nil "\"~A\" with lines title \"~A\" "
-                                              (first tmp-file-names) (third pl)))))
+                                      (format nil "\"~A\" ~A"
+                                              (first tmp-file-names) (parse-label (third pl))))))
       (format stream "set grid~%")
       (format stream "~A~%" plt-cmd)
       (force-output stream))
@@ -164,11 +185,11 @@ vals could be: y                  plot y over its index
        (defvar y)
        (setf x (range 0 (* 2 pi) 0.01))
        (setf y (map 'vector #'sin x))
-       (plot x y "y = sin(x)")
+       (plot x y ";y = sin(x);")
        (defvar z)
        (setf z (map 'vector #'cos x))
-       (plot x y "y = sin(x)" x z "y = cos(x)")
+       (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
-       (plot x y "y = cos(2x) (new-plot)")
+       (plot x y "+k;y = cos(2x) (new-plot);")
        (close-all-plots)))))
