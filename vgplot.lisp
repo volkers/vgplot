@@ -69,6 +69,19 @@
          (delete-file name)))
   nil)
 
+(defun count-data-columns (s)
+  "Count data columns in strings like \"1 2 3 # comment\", seperators
+  could be a variable number of spaces or tabs"
+  (let ((sep t) (num 0))
+               (loop for c across s do
+                    (cond
+                      ((eql c #\# ) (return))
+                      ((eql c #\	 ) (setf sep t))
+                      ((eql c #\ ) (setf sep t))
+                      (t (when sep
+                           (incf num)
+                           (setf sep nil)))))
+               num))
 
 (let ((stream-list nil) ; List holding the streams of not active plots
       (stream nil) ; Stream of the active plot
@@ -125,7 +138,26 @@ vals could be: y                  plot y over its index
       (format stream "set grid~%")
       (format stream "~A~%" plt-cmd)
       (force-output stream))
-    t))
+    t)
+  (defun plot-file (data-file)
+    "Plot data-file directly, datafile must hold columns separated by spaces or tabs, use with-lines style"
+    (let ((c-num)
+          (cmd-string (format nil "plot \"~A\" using ($1) with lines" data-file)))
+      (with-open-file (in data-file :direction :input)
+        ;; use only lines with more than zero columns, i.e. drop comment lines
+        (setf c-num (do ((num (count-data-columns (read-line in))
+                                (count-data-columns (read-line in))))
+                        ((> num 0) num))))
+      (loop for i from 2 to c-num do
+         (setf cmd-string (concatenate 'string cmd-string
+                                       (format nil ", \"~A\" using ($~A) with lines" data-file i))))
+      (unless stream
+        (setf stream (open-plot)))
+      (format stream "set grid~%")
+      (format stream "~A~%" cmd-string)
+      (force-output stream))
+    t)
+)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
