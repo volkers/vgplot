@@ -46,8 +46,8 @@
   (let ((style "lines")
         (color "red")
         (title "")
-        (start-title (search ";" lbl))
-        (end-title (search ";" lbl :from-end t)))
+        (start-title (or (search ";" lbl) -1)) ;; -1 because subseq jumps over first ;
+        (end-title (or (search ";" lbl :from-end t) (length lbl))))
     (setf title (subseq lbl (1+ start-title) end-title))
     (when (> start-title 0)
       (loop for c across (subseq lbl 0 start-title) do
@@ -217,7 +217,8 @@ vals could be: y                  plot y over its index
        (defvar y)
        (setf x (range 0 (* 2 pi) 0.01))
        (setf y (map 'vector #'sin x))
-       (plot x y ";y = sin(x);")
+       (plot x y)
+       (plot x y "y = sin(x)")
        (defvar z)
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
