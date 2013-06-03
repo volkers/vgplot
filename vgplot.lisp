@@ -226,4 +226,5 @@ vals could be: y                  plot y over its index
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
+       (plot-file "data.txt")
        (close-all-plots)))))
