@@ -213,11 +213,12 @@ vals could be: y                  plot y over its index
     (format t "****************************************************************~%")
     (print-n-run-list
      '( ;; add demo commands here
+       (plot '(1 2 3) '(0 -2 17))
+       (plot '(1 2 3) '(0 -2 17) ";silly example;")
        (defvar x)
        (defvar y)
        (setf x (range 0 (* 2 pi) 0.01))
        (setf y (map 'vector #'sin x))
-       (plot x y)
        (plot x y "y = sin(x)")
        (defvar z)
        (setf z (map 'vector #'cos x))
