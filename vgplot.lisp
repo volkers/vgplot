@@ -24,6 +24,14 @@
   "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
 
+(defun read-n-print-no-hang (s)
+  "Read from stream and print directly (non blocking)"
+  (sleep 0.2) ;; probably better done in a different thread
+  (do ((c (read-char-no-hang s)
+          (read-char-no-hang s)))
+      ((null c))
+    (format t "~c" c)))
+
 (defun vectorize (vals)
   "Coerce all sequences except strings to vectors"
   (mapcar #'(lambda (x) (if (stringp x)
@@ -92,7 +100,8 @@
       (setf stream (open-plot)))
     (apply #'format stream text args)
     (fresh-line stream)
-    (force-output stream))
+    (force-output stream)
+    (read-n-print-no-hang stream))
   (defun close-plot ()
     "Close connected gnuplot"
     (when stream
@@ -140,7 +149,7 @@ vals could be: y                  plot y over its index
       (format stream "set grid~%")
       (format stream "~A~%" plt-cmd)
       (force-output stream))
-    t)
+    (read-n-print-no-hang stream))
   (defun plot-file (data-file)
     "Plot data-file directly, datafile must hold columns separated by spaces or tabs, use with-lines style"
     (let ((c-num)
@@ -158,7 +167,7 @@ vals could be: y                  plot y over its index
       (format stream "set grid~%")
       (format stream "~A~%" cmd-string)
       (force-output stream))
-    t)
+    (read-n-print-no-hang stream))
 )
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
