@@ -170,6 +170,9 @@ vals could be: y                  plot y over its index
     (read-n-print-no-hang stream))
 )
 
+;; figure is an alias to new-plot (because it's used that way in octave/matlab)
+(setf (symbol-function 'figure) #'new-plot)
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
 
