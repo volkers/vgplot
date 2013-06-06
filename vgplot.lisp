@@ -191,6 +191,9 @@ e.g.:
 ;; figure is an alias to new-plot (because it's used that way in octave/matlab)
 (setf (symbol-function 'figure) #'new-plot)
 
+(defun replot ()
+  (format-plot "replot"))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
 
