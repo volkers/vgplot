@@ -126,8 +126,26 @@
 vals could be: y                  plot y over its index
                x y                plot y = f(x)
                x y lable-string   plot y = f(x) using lable-string as label
-               following parameters add plots e.g.:
-               x y label x1 y1 label1 ..."
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+label:
+A simple label in form of \"text\" is printed directly.
+
+A label with added style commands: label in form \"styles;text;\":
+styles can be (combinations possible):
+   \"-\" lines
+   \".\" dots
+   \"+\" points
+   \"r\" red
+   \"g\" green
+   \"b\" blue
+   \"c\" cyan
+   \"k\" black
+
+e.g.:
+   (plot x y \"r+;red values;\") plots y = f(x) as red points with the
+                                 label \"red values\"
+"
     (unless stream
       (setf stream (open-plot)))
     (setf tmp-file-names (del-tmp-files tmp-file-names))
