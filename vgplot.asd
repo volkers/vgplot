@@ -5,6 +5,6 @@
   :description "Interface to gnuplot"
   :author "Volker Sarodnick <volkersar@gmx.net>"
   :license "GPL"
-  :depends-on (#:ltk #:cl-fad)
+  :depends-on (#:ltk #:cl-fad #:cl-ppcre)
   :components ((:file "package")
                (:file "vgplot")))

@@ -24,13 +24,19 @@
   "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
 
+(defun read-no-hang (s)
+  "Read from stream and return string (non blocking)"
+  (sleep 0.2) ;; probably better done in a different thread
+  (let ((chars))
+    (do ((c (read-char-no-hang s)
+            (read-char-no-hang s)))
+        ((null c))
+      (push c chars))
+    (coerce (nreverse chars) 'string)))
+
 (defun read-n-print-no-hang (s)
   "Read from stream and print directly (non blocking)"
-  (sleep 0.2) ;; probably better done in a different thread
-  (do ((c (read-char-no-hang s)
-          (read-char-no-hang s)))
-      ((null c))
-    (format t "~c" c)))
+  (format t "~a" (read-no-hang s)))
 
 (defun vectorize (vals)
   "Coerce all sequences except strings to vectors"
@@ -193,6 +199,22 @@ e.g.:
 
 (defun replot ()
   (format-plot "replot"))
+
+(defun parse-axis (axis-s)
+  "Parse gnuplot string e.g.
+\"	set xrange [ * : * ] noreverse nowriteback  # (currently [1.00000:3.00000] )\"
+and return range as a list of floats, e.g. '(1.0 3.0)"
+  ;;                                       number pair separated by colon
+  (cl-ppcre:register-groups-bind (min max) ("([\\d.]+):([\\d.]+)" axis-s)
+    (mapcar (lambda (s) (coerce (read-from-string s) 'float)) (list min max))))
+
+(defun axis (&optional limit-list)
+  "Set axis to limit-list and return actual limit-list, limit-list could be:
+'(xmin xmax) or '(xmin xmax ymin ymax),
+nil for one value means not to change this limit;
+nil for every value unzoom to default axis;
+without limit-list do return current axis."
+  nil)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
