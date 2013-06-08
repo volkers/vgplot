@@ -107,7 +107,7 @@
     (apply #'format stream text args)
     (fresh-line stream)
     (force-output stream)
-    (read-n-print-no-hang stream))
+    (read-no-hang stream))
   (defun close-plot ()
     "Close connected gnuplot"
     (when stream
@@ -205,7 +205,7 @@ e.g.:
 \"	set xrange [ * : * ] noreverse nowriteback  # (currently [1.00000:3.00000] )\"
 and return range as a list of floats, e.g. '(1.0 3.0)"
   ;;                                       number pair separated by colon
-  (cl-ppcre:register-groups-bind (min max) ("([\\d.]+):([\\d.]+)" axis-s)
+  (cl-ppcre:register-groups-bind (min max) ("([-\\d.]+):([-\\d.]+)" axis-s)
     (mapcar (lambda (s) (coerce (read-from-string s) 'float)) (list min max))))
 
 (defun axis (&optional limit-list)
@@ -214,7 +214,12 @@ and return range as a list of floats, e.g. '(1.0 3.0)"
 nil for one value means not to change this limit;
 nil for every value unzoom to default axis;
 without limit-list do return current axis."
-  nil)
+  (unless (null limit-list)
+    ;; not implemented yet
+    )
+  ;; and return current axis settings
+  (append (parse-axis (format-plot "show xrange"))
+          (parse-axis (format-plot "show yrange"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities

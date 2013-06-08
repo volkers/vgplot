@@ -4,7 +4,8 @@
   (:use :cl)
   (:import-from :ltk :do-execute)
   (:import-from :cl-fad :with-output-to-temporary-file)
-  (:export :close-all-plots
+  (:export :axis
+           :close-all-plots
            :close-plot
            :demo
            :figure
