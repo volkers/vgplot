@@ -28,7 +28,7 @@
 
 (defun read-no-hang (s)
   "Read from stream and return string (non blocking)"
-  (sleep 0.2) ;; probably better done in a different thread
+  (sleep 0.01) ;; not perfect, better idea?
   (let ((chars))
     (do ((c (read-char-no-hang s)
             (read-char-no-hang s)))
