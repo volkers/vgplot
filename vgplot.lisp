@@ -103,8 +103,8 @@
       (stream nil) ; Stream of the active plot
       (tmp-file-names nil)) ; list of temporary filenames
   (defun format-plot (print? text &rest args)
-    "Format directly to active gnuplot process, return gnuplots answer
-if print? is true print answer string also"
+    "Send a command directly to active gnuplot process, return gnuplots response
+print also response to stdout if print? is true"
     (unless stream
       (setf stream (open-plot)))
     (apply #'format stream text args)
