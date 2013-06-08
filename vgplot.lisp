@@ -20,6 +20,8 @@
 
 (in-package #:vgplot)
 
+(defvar *debug* nil)
+
 (defun open-plot ()
   "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
@@ -100,14 +102,17 @@
 (let ((stream-list nil) ; List holding the streams of not active plots
       (stream nil) ; Stream of the active plot
       (tmp-file-names nil)) ; list of temporary filenames
-  (defun format-plot (text &rest args)
-    "Format directly to active gnuplot process"
+  (defun format-plot (print? text &rest args)
+    "Format directly to active gnuplot process, return gnuplots answer
+if print? is true print answer string also"
     (unless stream
       (setf stream (open-plot)))
     (apply #'format stream text args)
     (fresh-line stream)
     (force-output stream)
-    (read-no-hang stream))
+    (if print?
+        (read-n-print-no-hang stream)
+        (read-no-hang stream)))
   (defun close-plot ()
     "Close connected gnuplot"
     (when stream
@@ -198,7 +203,7 @@ e.g.:
 (setf (symbol-function 'figure) #'new-plot)
 
 (defun replot ()
-  (format-plot "replot"))
+  (format-plot *debug* "replot"))
 
 (defun parse-axis (axis-s)
   "Parse gnuplot string e.g.
@@ -216,13 +221,16 @@ nil for every value unzoom to default axis;
 without limit-list do return current axis."
   (unless (null limit-list)
     ;; replace nil by "*"
-    (let ((ax (mapcar (lambda (val) (or val "*")) limit-list)))
-      (format-plot "set xrange [~,,,,,,'eE:~,,,,,,'eE]" (first ax) (second ax))
-      (format-plot "set yrange [~,,,,,,'eE:~,,,,,,'eE]" (third ax) (fourth ax))
+    (let ((ax (loop for i to 3 collect (let ((val (nth i limit-list)))
+                                         (if val
+                                             (format nil "~,,,,,,'eE" val)
+                                             "*")))))
+      (format-plot *debug* "set xrange [~a:~a]" (first ax) (second ax))
+      (format-plot *debug* "set yrange [~a:~a]" (third ax) (fourth ax))
       (replot)))
   ;; and return current axis settings
-  (append (parse-axis (format-plot "show xrange"))
-          (parse-axis (format-plot "show yrange"))))
+  (append (parse-axis (format-plot *debug* "show xrange"))
+          (parse-axis (format-plot *debug* "show yrange"))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
