@@ -205,8 +205,8 @@ e.g.:
 \"	set xrange [ * : * ] noreverse nowriteback  # (currently [1.00000:3.00000] )\"
 and return range as a list of floats, e.g. '(1.0 3.0)"
   ;;                                       number pair separated by colon
-  (cl-ppcre:register-groups-bind (min max) ("([-\\d.]+):([-\\d.]+)" axis-s)
-    (mapcar (lambda (s) (coerce (read-from-string s) 'float)) (list min max))))
+  (cl-ppcre:register-groups-bind (min max) ("([-\\d.]+) ?: ?([-\\d.]+)" axis-s)
+    (mapcar (lambda (s) (float (read-from-string s))) (list min max))))
 
 (defun axis (&optional limit-list)
   "Set axis to limit-list and return actual limit-list, limit-list could be:
@@ -215,8 +215,11 @@ nil for one value means not to change this limit;
 nil for every value unzoom to default axis;
 without limit-list do return current axis."
   (unless (null limit-list)
-    ;; not implemented yet
-    )
+    ;; replace nil by "*"
+    (let ((ax (mapcar (lambda (val) (or val "*")) limit-list)))
+      (format-plot "set xrange [~,,,,,,'eE:~,,,,,,'eE]" (first ax) (second ax))
+      (format-plot "set yrange [~,,,,,,'eE:~,,,,,,'eE]" (third ax) (fourth ax))
+      (replot)))
   ;; and return current axis settings
   (append (parse-axis (format-plot "show xrange"))
           (parse-axis (format-plot "show yrange"))))
@@ -282,9 +285,12 @@ without limit-list do return current axis."
        (setf x (range 0 (* 2 pi) 0.01))
        (setf y (map 'vector #'sin x))
        (plot x y "y = sin(x)")
+       (axis (list (/ pi 2) 5))
+       (axis '(-1 pi -1.2 1.2))
        (defvar z)
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
+       (axis '(nil nil nil nil))
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
