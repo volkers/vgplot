@@ -1,0 +1,196 @@
+
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>API for VGPLOT</title>
+<style type="text/css" media="all">
+body {margin: 0 2em .5em 2em;font-family: Verdana,Arial,sans-serif;}
+.package {background: #efefef; 
+          padding: 1.5em 0 1em 0; 
+          text-align: center; 
+          font-size: x-large;}
+.definition {background: #efefef; padding: .3em 1em;}
+a.symbolname, a:visited.symbolname {font-weight: bold;}
+.initargs {font-size: small;}
+.slots {font-size: small;}
+div.label {border-bottom: 1px solid #efefef; margin-bottom: .5em}
+.symboldecl, .footer {margin: 0 2em 2em 2em;}
+.symbolname {font-weight: bold; color: gray;}
+.symboltype {font-style: italic;margin-left: 1.5em; font-size: smaller;}
+.documentation {color: gray; font-family: Fixed,monospace;margin: 0 0 1.5em 0.5em;}
+.packagedocumentation {color: gray; 
+                       font-family: Fixed,monospace;
+                       margin: 0 0 1.5em 0; 
+                       border: 1px solid #efefef; 
+                       padding-left: 1.5em;}
+.symbolcomments span {font-weight: bold;}
+.footer {font-size: x-small; text-align: right; margin-top: 2em; padding-top: 1em; border-top: 1px solid gray;}
+.undocumented {color: red; font-weight: bold;}
+a, a:visited {font-weight: bold; color: gray; text-decoration: none; font-weight: normal;}
+a:hover {border-bottom: 1px solid gray; }
+.label {font-weight: bold; font-style: italic;color: gray;}
+.labeltitle {font-weight: bold; font-style: italic;color: gray; border: 1px solid #efefef; padding: .25em;margin-bottom: .5em}
+.frame {marin-top: 1.5em}
+.expander {border: 2px solid #efefef; color: gray; 
+           font-weight: bold; 
+           font-family: Fixed,monospace; 
+           margin-right: .25em; padding: 0 .25em;cursor: pointer;}
+</style>
+<script type="text/javascript">
+function expand (expander, id) {
+var text = expander.innerHTML;
+if (text == '-')
+{
+  expander.innerHTML = '+';
+  document.getElementById(id).style.display = 'none';
+}
+else
+{
+  expander.innerHTML = '-';
+  document.getElementById(id).style.display = '';
+}
+}</script></head>
+<body>
+<div class="package">
+<div class="definition">API for package: 
+<a class="symbolname" name="vgplot_package" href="#vgplot_package">vgplot</a></div></div>
+<div class="packagedocumentation">
+<pre>
+# vgplot
+
+This common lisp library is an interface to the gnuplot plotting
+utility.
+
+The intention of the API is to be similar to some of the plot commands
+of octave or matlab.
+
+## Usage
+
+(asdf:load-system :vgplot)
+
+(vgplot:plot '(1 2 3) '(0 -2 17))
+
+For examples run the demo function in vgplot.lisp:
+
+(vgplot:demo)
+
+## License
+
+Copyright (C) 2013 Volker Sarodnick
+
+GNU General Public License
+</pre></div>
+<div class="frame">
+<div class="labeltitle">
+<span class="expander" onclick="expand(this, 'functions');">-</span>Functions</div>
+<div id="functions">
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="axis_func" href="#axis_func">axis</a>
+<span class="lambdalist">&optional limit-list</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Set axis to limit-list and return actual limit-list, limit-list could be:
+'(xmin xmax) or '(xmin xmax ymin ymax),
+nil for one value means not to change this limit;
+nil for every value unzoom to default axis;
+without limit-list do return current axis.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="close-all-plots_func" href="#close-all-plots_func">close-all-plots</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Close all connected gnuplots</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="close-plot_func" href="#close-plot_func">close-plot</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Close connected gnuplot</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="demo_func" href="#demo_func">demo</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Show usecases of vgplot.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="figure_func" href="#figure_func">figure</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add a new plot window to a current one.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="format-plot_func" href="#format-plot_func">format-plot</a>
+<span class="lambdalist">print? text &rest args</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Send a command directly to active gnuplot process, return gnuplots response
+print also response to stdout if print? is true</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="new-plot_func" href="#new-plot_func">new-plot</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add a new plot window to a current one.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="plot_func" href="#plot_func">plot</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Plot y = f(x) on active plot, create plot if needed.
+vals could be: y                  plot y over its index
+               x y                plot y = f(x)
+               x y lable-string   plot y = f(x) using lable-string as label
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+label:
+A simple label in form of "text" is printed directly.
+
+A label with added style commands: label in form "styles;text;":
+styles can be (combinations possible):
+   "-" lines
+   "." dots
+   "+" points
+   "r" red
+   "g" green
+   "b" blue
+   "c" cyan
+   "k" black
+
+e.g.:
+   (plot x y "r+;red values;") plots y = f(x) as red points with the
+                                 label "red values"
+</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="plot-file_func" href="#plot-file_func">plot-file</a>
+<span class="lambdalist">data-file</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Plot data-file directly, datafile must hold columns separated by spaces or tabs, use with-lines style</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="range_func" href="#range_func">range</a>
+<span class="lambdalist">a &optional b (step 1)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Return vector of values in a certain range:
+(range limit) return natural numbers below limit
+(range start limit) return ordinary numbers starting with start below limit
+(range start limit step) return numbers starting with start, successively adding step untill reaching limit (excluding)</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="replot_func" href="#replot_func">replot</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Send the replot command to gnuplot, i.e. apply all recent changes in the plot.</pre></div></div></div></div>
+<div class="footer">Generated by: 
+<a href="http://common-lisp.net/project/cl-api">CL-API</a></div></body></html>
