@@ -203,6 +203,7 @@ e.g.:
 (setf (symbol-function 'figure) #'new-plot)
 
 (defun replot ()
+  "Send the replot command to gnuplot, i.e. apply all recent changes in the plot."
   (format-plot *debug* "replot"))
 
 (defun parse-axis (axis-s)
@@ -280,6 +281,7 @@ without limit-list do return current axis."
               (eval cmd))))
 
 (defun demo ()
+  "Show usecases of vgplot."
   (let ((*print-case* :downcase))
     (format t "****************************************************************~%")
     (format t "vgplot demo, run commands by pressing RETURN~%")
