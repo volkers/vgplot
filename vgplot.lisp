@@ -208,26 +208,33 @@ e.g.:
 
 (defun parse-axis (axis-s)
   "Parse gnuplot string e.g.
-\"	set xrange [ * : * ] noreverse nowriteback  # (currently [1.00000:3.00000] )\"
+\"	set xrange [ * : 4.00000 ] noreverse nowriteback  # (currently [1.00000:] )\"
 and return range as a list of floats, e.g. '(1.0 3.0)"
-  ;;                                       number pair separated by colon
-  (cl-ppcre:register-groups-bind (min max) ("([-\\d.]+) ?: ?([-\\d.]+)" axis-s)
-    (mapcar (lambda (s) (float (read-from-string s))) (list min max))))
+  ;;                                       number before colon
+  (cl-ppcre:register-groups-bind (min) ("([-\\d.]+) ?:" axis-s)
+    ;;                                     number efter colon
+    (cl-ppcre:register-groups-bind (max) (": ?([-\\d.]+)" axis-s)
+      (mapcar (lambda (s) (float (read-from-string s))) (list min max)))))
 
 (defun axis (&optional limit-list)
   "Set axis to limit-list and return actual limit-list, limit-list could be:
 '(xmin xmax) or '(xmin xmax ymin ymax),
-nil for one value means not to change this limit;
-nil for every value unzoom to default axis;
+values can be:
+  a number: use it as the corresponding limit
+  nil:      do not to change this limit;
+  t:        autoscale this limit;
 without limit-list do return current axis."
   (unless (null limit-list)
-    ;; replace nil by "*"
-    (let ((ax (loop for i to 3 collect (let ((val (nth i limit-list)))
-                                         (if val
-                                             (format nil "~,,,,,,'eE" val)
-                                             "*")))))
-      (format-plot *debug* "set xrange [~a:~a]" (first ax) (second ax))
-      (format-plot *debug* "set yrange [~a:~a]" (third ax) (fourth ax))
+    ;; gather actual limits
+    (let* ((is-limit (append (parse-axis (format-plot *debug* "show xrange"))
+                             (parse-axis (format-plot *debug* "show yrange"))))
+           (limit (loop for i to 3 collect
+                       (let ((val (nth i limit-list)))
+                         (cond ((numberp val) (format nil "~,,,,,,'eE" val))
+                               ((or val) "*")            ; autoscale
+                               (t (nth i is-limit))))))) ; same value again
+      (format-plot *debug* "set xrange [~a:~a]" (first limit) (second limit))
+      (format-plot *debug* "set yrange [~a:~a]" (third limit) (fourth limit))
       (replot)))
   ;; and return current axis settings
   (append (parse-axis (format-plot *debug* "show xrange"))
@@ -296,11 +303,13 @@ without limit-list do return current axis."
        (setf y (map 'vector #'sin x))
        (plot x y "y = sin(x)")
        (axis (list (/ pi 2) 5))
-       (axis '(-1 pi -1.2 1.2))
+       (axis (list -1 pi -1.2 1.2))
+       (axis '(t  nil))
+       (axis '(nil nil -1.5 t))
        (defvar z)
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
-       (axis '(nil nil nil nil))
+       (axis '(t t t t))
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
