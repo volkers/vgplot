@@ -37,8 +37,8 @@
     (coerce (nreverse chars) 'string)))
 
 (defun read-n-print-no-hang (s)
-  "Read from stream and print directly (non blocking)"
-  (format t "~a" (read-no-hang s)))
+  "Read from stream and print directly (non blocking). Return read string"
+  (princ (read-no-hang s)))
 
 (defun vectorize (vals)
   "Coerce all sequences except strings to vectors"
