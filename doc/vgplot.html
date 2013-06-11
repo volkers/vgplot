@@ -92,8 +92,10 @@ GNU General Public License
 <div class="documentation">
 <pre>Set axis to limit-list and return actual limit-list, limit-list could be:
 '(xmin xmax) or '(xmin xmax ymin ymax),
-nil for one value means not to change this limit;
-nil for every value unzoom to default axis;
+values can be:
+  a number: use it as the corresponding limit
+  nil:      do not to change this limit
+  t:        autoscale this limit
 without limit-list do return current axis.</pre></div></div>
 <div class="symboldecl">
 <div class="definition">

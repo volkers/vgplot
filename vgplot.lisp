@@ -221,8 +221,8 @@ and return range as a list of floats, e.g. '(1.0 3.0)"
 '(xmin xmax) or '(xmin xmax ymin ymax),
 values can be:
   a number: use it as the corresponding limit
-  nil:      do not to change this limit;
-  t:        autoscale this limit;
+  nil:      do not to change this limit
+  t:        autoscale this limit
 without limit-list do return current axis."
   (unless (null limit-list)
     ;; gather actual limits
