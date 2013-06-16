@@ -16,6 +16,8 @@ For examples run the demo function in vgplot.lisp:
 
 (vgplot:demo)
 
+and see API documentation in doc/vgplot.html
+
 ## License
 
 Copyright (C) 2013 Volker Sarodnick

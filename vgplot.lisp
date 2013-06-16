@@ -319,3 +319,10 @@ q ENTER quits"
        (plot x y "+k;y = cos(2x) (new-plot);")
        (plot-file "data.txt")
        (close-all-plots)))))
+
+(defun make-doc ()
+  "Update README and html documentation"
+  (with-open-file (stream "README" :direction :output :if-exists :supersede)
+    (write-string (documentation (find-package :vgplot) 't) stream))
+  ;; dependency to cl-api not defined in asd-file because function is not exported
+  (cl-api:api-gen :vgplot "doc/vgplot.html"))

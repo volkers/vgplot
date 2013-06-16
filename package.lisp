@@ -4,8 +4,7 @@
   (:use :cl)
   (:import-from :ltk :do-execute)
   (:import-from :cl-fad :with-output-to-temporary-file)
-  (:documentation "
-# vgplot
+  (:documentation "# vgplot
 
 This common lisp library is an interface to the gnuplot plotting
 utility.
@@ -22,6 +21,8 @@ of octave or matlab.
 For examples run the demo function in vgplot.lisp:
 
 (vgplot:demo)
+
+and see API documentation in doc/vgplot.html
 
 ## License
 
