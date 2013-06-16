@@ -206,6 +206,14 @@ e.g.:
   "Send the replot command to gnuplot, i.e. apply all recent changes in the plot."
   (format-plot *debug* "replot"))
 
+(defun grid (style)
+  "Add grid to plot if style t, otherwise remove grid."
+  (if style
+      (format-plot *debug* "set grid~%")
+      (format-plot *debug* "unset grid~%"))
+  (replot))
+
+
 (defun parse-axis (axis-s)
   "Parse gnuplot string e.g.
 \"	set xrange [ * : 4.00000 ] noreverse nowriteback  # (currently [1.00000:] )\"
@@ -310,6 +318,7 @@ ENTER continue, all other characters break and quit demo"
        (axis (list -1 pi -1.2 1.2))
        (axis '(t  nil))
        (axis '(nil nil -1.5 t))
+       (grid nil)
        (defvar z)
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")

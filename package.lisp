@@ -36,6 +36,7 @@ GNU General Public License
            :demo
            :figure
            :format-plot
+           :grid
            :new-plot
            :plot
            :plot-file
