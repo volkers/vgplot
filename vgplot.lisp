@@ -333,5 +333,7 @@ ENTER continue, all other characters break and quit demo"
   "Update README and html documentation"
   (with-open-file (stream "README" :direction :output :if-exists :supersede)
     (write-string (documentation (find-package :vgplot) 't) stream))
-  ;; dependency to cl-api not defined in asd-file because function is not exported
-  (cl-api:api-gen :vgplot "doc/vgplot.html"))
+  ;; dependency to cl-api not defined in asd-file because I don't want getting
+  ;; this dependency (make-doc is internal and should only be used by developer)
+  ;; ignore that :api-gen is probably not loaded in standard case
+  (ignore-errors (funcall (find-symbol "API-GEN" 'cl-api) :vgplot "doc/vgplot.html")))
