@@ -281,11 +281,11 @@ without limit-list do return current axis."
     (coerce (nreverse chars) 'string)))
 
 (defun print-n-run-list (lst)
-  "Print commands in lst and run them after a (read-line),
-q ENTER quits"
+  "Print commands in lst and run them after a (read-char),
+ENTER continue, all other characters break and quit demo"
   (loop for cmd in lst do
        (progn (princ (drop-substring "vgplot::" (format nil "~s" cmd)))
-              (when (string= "q" (read-line))
+              (unless (char= #\Newline (read-char))
                 (close-all-plots)
                 (return-from print-n-run-list nil))
               (eval cmd))))
@@ -295,7 +295,7 @@ q ENTER quits"
   (let ((*print-case* :downcase))
     (format t "****************************************************************~%")
     (format t "vgplot demo, run commands by pressing RETURN~%")
-    (format t "press q RETURN to leave the demo~%")
+    (format t "press q (or any other character) RETURN to leave the demo~%")
     (format t "****************************************************************~%")
     (print-n-run-list
      '( ;; add demo commands here
