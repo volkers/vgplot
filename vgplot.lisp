@@ -209,8 +209,8 @@ e.g.:
 (defun grid (style)
   "Add grid to plot if style t, otherwise remove grid."
   (if style
-      (format-plot *debug* "set grid~%")
-      (format-plot *debug* "unset grid~%"))
+      (format-plot *debug* "set grid")
+      (format-plot *debug* "unset grid"))
   (replot))
 
 (defun title (str)
