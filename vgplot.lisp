@@ -213,6 +213,11 @@ e.g.:
       (format-plot *debug* "unset grid~%"))
   (replot))
 
+(defun title (str)
+  "Add title str to plot"
+  (format-plot *debug* "set title \"~A\"" str)
+  (format-plot *debug* "show title")
+  (replot))
 
 (defun parse-axis (axis-s)
   "Parse gnuplot string e.g.
@@ -309,6 +314,7 @@ ENTER continue, all other characters break and quit demo"
      '( ;; add demo commands here
        (plot '(1 2 3) '(0 -2 17))
        (plot '(1 2 3) '(0 -2 17) ";silly example;")
+       (title "Simple curve")
        (defvar x)
        (defvar y)
        (setf x (range 0 (* 2 pi) 0.01))
@@ -323,6 +329,7 @@ ENTER continue, all other characters break and quit demo"
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
        (axis '(t t t t))
+       (title "Some Angular Graphs")
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")

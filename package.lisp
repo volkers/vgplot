@@ -41,4 +41,5 @@ GNU General Public License
            :plot
            :plot-file
            :replot
-           :range))
+           :range
+           :title))
