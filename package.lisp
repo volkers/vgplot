@@ -42,4 +42,6 @@ GNU General Public License
            :plot-file
            :replot
            :range
-           :title))
+           :title
+           :xlabel
+           :ylabel))

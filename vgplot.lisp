@@ -214,9 +214,21 @@ e.g.:
   (replot))
 
 (defun title (str)
-  "Add title str to plot"
+  "Add title str to plot."
   (format-plot *debug* "set title \"~A\"" str)
   (format-plot *debug* "show title")
+  (replot))
+
+(defun xlabel (str)
+  "Add x axis label."
+  (format-plot *debug* "set xlabel \"~A\"" str)
+  (format-plot *debug* "show xlabel")
+  (replot))
+
+(defun ylabel (str)
+  "Add y axis label."
+  (format-plot *debug* "set ylabel \"~A\"" str)
+  (format-plot *debug* "show ylabel")
   (replot))
 
 (defun parse-axis (axis-s)
@@ -320,6 +332,8 @@ ENTER continue, all other characters break and quit demo"
        (setf x (range 0 (* 2 pi) 0.01))
        (setf y (map 'vector #'sin x))
        (plot x y "y = sin(x)")
+       (xlabel "[rad]")
+       (ylabel "magnitude")
        (axis (list (/ pi 2) 5))
        (axis (list -1 pi -1.2 1.2))
        (axis '(t  nil))
