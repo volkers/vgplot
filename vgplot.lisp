@@ -206,30 +206,38 @@ e.g.:
   "Send the replot command to gnuplot, i.e. apply all recent changes in the plot."
   (format-plot *debug* "replot"))
 
-(defun grid (style)
-  "Add grid to plot if style t, otherwise remove grid."
+(defun grid (style &optional (replot? t))
+  "Add grid to plot if style t, otherwise remove grid.
+If the optional parameter replot? is true (default) run an additional replot thereafter."
   (if style
       (format-plot *debug* "set grid")
       (format-plot *debug* "unset grid"))
-  (replot))
+  (when replot?
+    (replot)))
 
-(defun title (str)
-  "Add title str to plot."
+(defun title (str &optional (replot? t))
+  "Add title str to plot. If the optional parameter replot? is true (default)
+run an additional replot thereafter."
   (format-plot *debug* "set title \"~A\"" str)
   (format-plot *debug* "show title")
-  (replot))
+  (when replot?
+    (replot)))
 
-(defun xlabel (str)
-  "Add x axis label."
+(defun xlabel (str &optional (replot? t))
+  "Add x axis label. If the optional parameter replot? is true (default)
+run an additional replot thereafter."
   (format-plot *debug* "set xlabel \"~A\"" str)
   (format-plot *debug* "show xlabel")
-  (replot))
+  (when replot?
+    (replot)))
 
-(defun ylabel (str)
-  "Add y axis label."
+(defun ylabel (str &optional (replot? t))
+  "Add y axis label. If the optional parameter replot? is true (default)
+run an additional replot thereafter."
   (format-plot *debug* "set ylabel \"~A\"" str)
   (format-plot *debug* "show ylabel")
-  (replot))
+  (when replot?
+    (replot)))
 
 (defun parse-axis (axis-s)
   "Parse gnuplot string e.g.
