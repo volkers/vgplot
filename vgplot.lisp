@@ -361,7 +361,7 @@ ENTER continue, all other characters break and quit demo"
     (format t "****************************************************************~%")
     (print-n-run-list
      '( ;; add demo commands here
-       (plot '(1 2 3) '(0 -2 17))
+       (plot '(0 -2 17))
        (plot '(1 2 3) '(0 -2 17) ";silly example;")
        (title "Simple curve")
        (defvar x)
