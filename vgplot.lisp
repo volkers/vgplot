@@ -85,14 +85,34 @@
          (delete-file name)))
   nil)
 
-(defun count-data-columns (s)
+(defun get-separator (s)
+  "Return the used separator in data string
+t   for whitespace \(standard separator in gnuplot)
+c   separator character
+nil comment line \(or empty line)"
+  (let ((data-found nil)) ; to handle comment-only lines
+    (loop for c across s do
+         (cond 
+           ((digit-char-p c) (setf data-found t))
+           ((eql c #\#) (loop-finish))
+           ;; ignore following characters
+           ((eql c #\.))
+           ((eql c #\ ))
+           ((eql c #\	))
+           (t (return-from get-separator c))))
+    (if data-found
+        t ; there was data before EOL or comment but no other separator
+        nil))) ; comment-only line
+
+(defun count-data-columns (s &optional (separator))
   "Count data columns in strings like \"1 2 3 # comment\", seperators
-  could be a variable number of spaces or tabs"
+could be a variable number of spaces, tabs or the optional separator"
   (let ((sep t) (num 0))
                (loop for c across s do
                     (cond
                       ((eql c #\# ) (return))
-                      ((eql c #\	 ) (setf sep t))
+                      ((eql c (or separator #\	)) (setf sep t))
+                      ((eql c #\	) (setf sep t))
                       ((eql c #\ ) (setf sep t))
                       (t (when sep
                            (incf num)
@@ -180,13 +200,18 @@ e.g.:
       (force-output stream))
     (read-n-print-no-hang stream))
   (defun plot-file (data-file)
-    "Plot data-file directly, datafile must hold columns separated by spaces or tabs, use with-lines style"
+    "Plot data-file directly, datafile must hold columns separated by spaces, tabs or commas
+\(other separators may work), use with-lines style"
     (let ((c-num)
+          (separator)
           (cmd-string (format nil "plot \"~A\" using ($1) with lines" data-file)))
       (with-open-file (in data-file :direction :input)
+        (setf separator (do ((c (get-separator (read-line in))
+                                (get-separator (read-line in))))
+                            ((or c) c))) ; comment lines return nil, drop them
         ;; use only lines with more than zero columns, i.e. drop comment lines
-        (setf c-num (do ((num (count-data-columns (read-line in))
-                                (count-data-columns (read-line in))))
+        (setf c-num (do ((num (count-data-columns (read-line in) separator)
+                              (count-data-columns (read-line in) separator)))
                         ((> num 0) num))))
       (loop for i from 2 to c-num do
          (setf cmd-string (concatenate 'string cmd-string
@@ -194,7 +219,11 @@ e.g.:
       (unless stream
         (setf stream (open-plot)))
       (format stream "set grid~%")
+      (when (characterp separator)
+        (format stream "set datafile separator \"~A\"~%" separator))
       (format stream "~A~%" cmd-string)
+      (when (characterp separator)
+        (format stream "set datafile separator~%")) ; reset separator
       (force-output stream))
     (read-n-print-no-hang stream))
 )
@@ -356,6 +385,7 @@ ENTER continue, all other characters break and quit demo"
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
        (plot-file "data.txt")
+       (plot-file "data.csv")
        (close-all-plots)))))
 
 (defun make-doc ()
