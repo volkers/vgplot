@@ -384,6 +384,9 @@ ENTER continue, all other characters break and quit demo"
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
+       (close-all-plots)
+       (or "The following works if you copy data.txt and data.csv
+from vgplot's source directory to your directory")
        (plot-file "data.txt")
        (plot-file "data.csv")
        (close-all-plots)))))
