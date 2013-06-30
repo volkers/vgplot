@@ -387,8 +387,10 @@ ENTER continue, all other characters break and quit demo"
        (close-all-plots)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
-       (plot-file "data.txt")
-       (plot-file "data.csv")
+       (when (cl-fad:file-exists-p "data.txt")
+         (plot-file "data.txt"))
+       (when (cl-fad:file-exists-p "data.csv")
+         (plot-file "data.csv"))
        (close-all-plots)))))
 
 (defun make-doc ()
