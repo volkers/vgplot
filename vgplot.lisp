@@ -97,6 +97,9 @@ nil comment line \(or empty line)"
            ((eql c #\#) (loop-finish))
            ;; ignore following characters
            ((eql c #\.))
+           ((eql c #\e)) ; e could be inside a number in exponential form
+           ((eql c #\-))
+           ((eql c #\+))
            ((eql c #\ ))
            ((eql c #\	))
            (t (return-from get-separator c))))
