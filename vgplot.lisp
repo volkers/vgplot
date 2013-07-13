@@ -98,6 +98,9 @@ nil comment line \(or empty line)"
            ;; ignore following characters
            ((eql c #\.))
            ((eql c #\e)) ; e could be inside a number in exponential form
+           ((eql c #\E))
+           ((eql c #\d)) ; even d could be inside a number...
+           ((eql c #\D))
            ((eql c #\-))
            ((eql c #\+))
            ((eql c #\ ))
