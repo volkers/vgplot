@@ -78,6 +78,23 @@
              (#\k (setf color "black")))))
     (format nil "with ~A linecolor rgb \"~A\" title \"~A\" " style color title)))
 
+(defun parse-floats (s sep)
+  "Parse string s and return the found numbers separated by separator"
+  (let ((c-list)
+        (r-list))
+    (loop for c across s do
+         (cond
+           ((eql c #\# ) (loop-finish)) ; rest of line is comment
+           ((eql c #\ )) ; ignore space
+           ((eql c #\	)) ; ignore tab
+           ((eql c sep) (progn
+                          (push (read-from-string (nreverse (coerce c-list 'string))) r-list)
+                          (setf c-list nil)))
+           (t (push c c-list))))
+    ;; add also number after the last sep:
+    (push (read-from-string (nreverse (coerce c-list 'string)) nil) r-list)
+    (nreverse r-list)))
+
 (defun del-tmp-files (tmp-file-list)
   "Delete files in tmp-file-list and return nil"
   (when tmp-file-list
@@ -308,6 +325,33 @@ without limit-list do return current axis."
   (append (parse-axis (format-plot *debug* "show xrange"))
           (parse-axis (format-plot *debug* "show yrange"))))
 
+(defun load-data-file (fname)
+  "Return a list of found vectors (one vector for one column) in data file fname 
+\(e.g. csv-file)"
+  (let ((c-num)
+        (separator)
+        (val-list))
+    (with-open-file (in fname :direction :input)
+      (setf separator (do ((c (get-separator (read-line in))
+                              (get-separator (read-line in))))
+                          ((or c) c))) ; comment lines return nil, drop them
+      ;; use only lines with more than zero columns, i.e. drop comment lines
+      (setf c-num (do ((num (count-data-columns (read-line in) separator)
+                            (count-data-columns (read-line in) separator)))
+                      ((> num 0) num))))
+    (dotimes (i c-num)
+      (push (make-array 100 :element-type 'number :adjustable t :fill-pointer 0) val-list))
+
+    (with-open-file (in fname :direction :input)
+      (let ((float-list))
+        (do ((line (read-line in nil 'eof)
+                   (read-line in nil 'eof)))
+            ((eql line 'eof))
+          (setf float-list (parse-floats line separator))
+          (and (first float-list) ; ignore comment lines
+               (mapcar #'vector-push-extend float-list val-list)))))
+    val-list))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
 
@@ -397,6 +441,8 @@ from vgplot's source directory to your directory")
          (plot-file "data.txt"))
        (when (cl-fad:file-exists-p "data.csv")
          (plot-file "data.csv"))
+       (when (cl-fad:file-exists-p "data.csv")
+         (plot (first (load-data-file "data.csv"))))
        (close-all-plots)))))
 
 (defun make-doc ()

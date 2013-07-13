@@ -37,6 +37,7 @@ GNU General Public License
            :figure
            :format-plot
            :grid
+           :load-data-file
            :new-plot
            :plot
            :plot-file
