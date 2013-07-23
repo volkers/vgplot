@@ -26,10 +26,19 @@
 (setq lisp-unit:*print-failures* t)
 
 (define-test test-get-separator
-    (assert-equal t (vgplot::get-separator "30	4	87"))
-    (assert-equal t (vgplot::get-separator "1.9e3 4 87"))
-    (assert-equal nil (vgplot::get-separator " # comment"))
-    (assert-equal nil (vgplot::get-separator ""))
-    (assert-equal #\, (vgplot::get-separator "30,4,87"))
-    (assert-equal #\; (vgplot::get-separator "30.04567;4;87 # comment"))
-    (assert-equal #\, (vgplot::get-separator " 30.0d19 ,4 , 87")))
+  (assert-equal t (vgplot::get-separator "30	4	87"))
+  (assert-equal t (vgplot::get-separator "1.9e3 4 87"))
+  (assert-equal nil (vgplot::get-separator " # comment"))
+  (assert-equal nil (vgplot::get-separator ""))
+  (assert-equal #\, (vgplot::get-separator "30,4,87"))
+  (assert-equal #\; (vgplot::get-separator "30.04567;4;87 # comment"))
+  (assert-equal #\, (vgplot::get-separator " 30.0d19 ,4 , 87")))
+
+(define-test test-count-data-columns
+  (assert-equal 0 (vgplot::count-data-columns ""))
+  (assert-equal 1 (vgplot::count-data-columns "17"))
+  (assert-equal 2 (vgplot::count-data-columns "17	987654321"))
+  (assert-equal 2 (vgplot::count-data-columns "1.7d179, 87654321" #\,))
+  (assert-equal 20 (vgplot::count-data-columns "1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0" #\,))
+  (assert-equal 2 (vgplot::count-data-columns "		1.7e179 ; 87654321 # comment" #\;))
+)
