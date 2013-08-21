@@ -71,6 +71,7 @@
              (#\- (setf style "lines"))
              (#\. (setf style "dots"))
              (#\+ (setf style "points"))
+             (#\o (setf style "circles"))
              (#\r (setf color "red"))
              (#\g (setf color "green"))
              (#\b (setf color "blue"))
@@ -190,6 +191,7 @@ styles can be (combinations possible):
    \"-\" lines
    \".\" dots
    \"+\" points
+   \"o\" circles
    \"r\" red
    \"g\" green
    \"b\" blue
@@ -434,6 +436,7 @@ ENTER continue, all other characters break and quit demo"
        (new-plot)
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
+       (plot x y "og;y = cos(2x) (new-plot);")
        (close-all-plots)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
