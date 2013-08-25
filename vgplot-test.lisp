@@ -20,9 +20,6 @@
 
 (in-package #:vgplot-test)
 
-;; call these tests by running:
-;; (lisp-unit:run-tests :all :vgplot-test)
-
 (setq lisp-unit:*print-failures* t)
 
 (define-test test-get-separator
@@ -42,3 +39,6 @@
   (assert-equal 20 (vgplot::count-data-columns "1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0" #\,))
   (assert-equal 2 (vgplot::count-data-columns "		1.7e179 ; 87654321 # comment" #\;))
 )
+
+(defun run ()
+  (lisp-unit:run-tests :all :vgplot-test))
