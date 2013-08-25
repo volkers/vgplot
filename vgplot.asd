@@ -1,11 +1,19 @@
 ;;;; vgplot.asd
 
-(asdf:defsystem #:vgplot
+(asdf:defsystem :vgplot
   :serial t
   :description "Interface to gnuplot"
   :author "Volker Sarodnick <volkersar@gmx.net>"
   :license "GPL"
-  :depends-on (#:ltk #:cl-fad #:cl-ppcre)
+  :depends-on (:ltk :cl-fad :cl-ppcre)
   :components ((:file "package")
                (:file "vgplot")))
 
+(asdf:defsystem :vgplot-test
+  :serial t
+  :description "Test environment for vgplot"
+  :author "Volker Sarodnick <volkersar@gmx.net>"
+  :license "GPL"
+  :depends-on (:vgplot :lisp-unit)
+  :components ((:file "package-test")
+               (:file "vgplot-test")))
