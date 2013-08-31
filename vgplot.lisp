@@ -437,6 +437,9 @@ ENTER continue, all other characters break and quit demo"
        (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
        (plot x y "+k;y = cos(2x) (new-plot);")
        (plot x y "og;y = cos(2x) (new-plot);")
+       (or "(format-plot) allows direct commands to the running gnuplot process")
+       (format-plot t "set size square 0.5,0.5~%")
+       (replot)
        (close-all-plots)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
