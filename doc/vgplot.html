@@ -83,6 +83,17 @@ GNU General Public License
 </pre></div>
 <div class="frame">
 <div class="labeltitle">
+<span class="expander" onclick="expand(this, 'conditions');">-</span>Conditions</div>
+<div id="conditions">
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="plot_class" href="#plot_class">plot</a>
+<span class="lambdalist">(structure-object)</span>
+<span class="symboltype">class</span></div>
+<div class="documentation">
+<pre></pre></div></div></div></div>
+<div class="frame">
+<div class="labeltitle">
 <span class="expander" onclick="expand(this, 'functions');">-</span>Functions</div>
 <div id="functions">
 <div class="symboldecl">
@@ -213,6 +224,26 @@ e.g.:
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Send the replot command to gnuplot, i.e. apply all recent changes in the plot.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="subplot_func" href="#subplot_func">subplot</a>
+<span class="lambdalist">rows cols index</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Set up a plot grid with rows by cols subwindows and use location index for next plot command.
+The plot index runs row-wise.  First all the columns in a row are
+filled and then the next row is filled.
+
+For example, a plot with 2 rows by 3 cols will have following plot indices:
+
+          +-----+-----+-----+
+          |  1  |  2  |  3  |
+          +-----+-----+-----+
+          |  4  |  5  |  6  |
+          +-----+-----+-----+
+
+Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
+</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="title_func" href="#title_func">title</a>

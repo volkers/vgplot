@@ -43,6 +43,7 @@ GNU General Public License
            :plot-file
            :replot
            :range
+           :subplot
            :title
            :xlabel
            :ylabel))

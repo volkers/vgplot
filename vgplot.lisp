@@ -22,6 +22,10 @@
 
 (defvar *debug* nil)
 
+(defstruct plot
+  (stream (open-plot))
+  (multiplot nil))
+
 (defun open-plot ()
   "Start gnuplot process and return stream to gnuplot"
   (do-execute "gnuplot" nil))
@@ -143,38 +147,38 @@ could be a variable number of spaces, tabs or the optional separator"
                            (setf sep nil)))))
                num))
 
-(let ((stream-list nil) ; List holding the streams of not active plots
-      (stream nil) ; Stream of the active plot
+(let ((plot-list nil)       ; List holding not active plots
+      (act-plot nil)        ; actual plot
       (tmp-file-names nil)) ; list of temporary filenames
   (defun format-plot (print? text &rest args)
     "Send a command directly to active gnuplot process, return gnuplots response
 print also response to stdout if print? is true"
-    (unless stream
-      (setf stream (open-plot)))
-    (apply #'format stream text args)
-    (fresh-line stream)
-    (force-output stream)
+    (unless act-plot
+      (setf act-plot (make-plot)))
+    (apply #'format (plot-stream act-plot) text args)
+    (fresh-line (plot-stream act-plot))
+    (force-output (plot-stream act-plot))
     (if print?
-        (read-n-print-no-hang stream)
-        (read-no-hang stream)))
+        (read-n-print-no-hang (plot-stream act-plot))
+        (read-no-hang (plot-stream act-plot))))
   (defun close-plot ()
     "Close connected gnuplot"
-    (when stream
-      (format stream "quit~%")
-      (force-output stream)
-      (close stream)
-      (setf stream (pop stream-list)))
+    (when act-plot
+      (format (plot-stream act-plot) "quit~%")
+      (force-output (plot-stream act-plot))
+      (close (plot-stream act-plot))
+      (setf act-plot (pop plot-list)))
     (setf tmp-file-names (del-tmp-files tmp-file-names)))
   (defun close-all-plots ()
     "Close all connected gnuplots"
     (close-plot)
-    (when stream
+    (when act-plot
       (close-all-plots)))
   (defun new-plot ()
     "Add a new plot window to a current one."
-    (when stream
-      (push stream stream-list)
-      (setf stream (open-plot)))
+    (when act-plot
+      (push act-plot plot-list)
+      (setf act-plot (make-plot)))
     (setf tmp-file-names (del-tmp-files tmp-file-names)))
   (defun plot (&rest vals)
     "Plot y = f(x) on active plot, create plot if needed.
@@ -202,8 +206,8 @@ e.g.:
    (plot x y \"r+;red values;\") plots y = f(x) as red points with the
                                  label \"red values\"
 "
-    (unless stream
-      (setf stream (open-plot)))
+    (unless act-plot
+      (setf act-plot (make-plot)))
     (setf tmp-file-names (del-tmp-files tmp-file-names))
     ;; todo: how to always delete temp files?
     (let ((val-l (parse-vals (vectorize vals)))
@@ -220,10 +224,52 @@ e.g.:
                                                   "plot ")
                                       (format nil "\"~A\" ~A"
                                               (first tmp-file-names) (parse-label (third pl))))))
-      (format stream "set grid~%")
-      (format stream "~A~%" plt-cmd)
-      (force-output stream))
-    (read-n-print-no-hang stream))
+      (format (plot-stream act-plot) "set grid~%")
+      (format (plot-stream act-plot) "~A~%" plt-cmd)
+      (force-output (plot-stream act-plot)))
+    (read-n-print-no-hang (plot-stream act-plot)))
+  (defun subplot (rows cols index)
+    "Set up a plot grid with rows by cols subwindows and use location index for next plot command.
+The plot index runs row-wise.  First all the columns in a row are
+filled and then the next row is filled.
+
+For example, a plot with 2 rows by 3 cols will have following plot indices:
+
+          +-----+-----+-----+
+          |  1  |  2  |  3  |
+          +-----+-----+-----+
+          |  4  |  5  |  6  |
+          +-----+-----+-----+
+
+Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
+"
+    (when (or (< index 1)
+              (> index (* rows cols)))
+      (progn
+        (format t "Index out of bound~%")
+        (return-from subplot nil)))
+    (let ((x-size (coerce (/ 1 cols) 'float))
+          (y-size (coerce (/ 1 rows) 'float))
+          (x-orig)
+          (y-orig))
+      (setf x-orig (* x-size (mod (- index 1) cols)))
+      (setf y-orig (- 1 (* y-size (+ 1 (floor (/ (- index 1) cols))))))
+      ;;
+      (unless act-plot
+        (setf act-plot (make-plot)))
+      (unless (plot-multiplot act-plot)
+        (format (plot-stream act-plot) "set multiplot~%")
+        (setf (plot-multiplot act-plot) t))
+      (read-n-print-no-hang (plot-stream act-plot))
+      (format (plot-stream act-plot) "set size ~A,~A~%" x-size y-size)
+      (read-n-print-no-hang (plot-stream act-plot))
+      (format (plot-stream act-plot) "set origin ~A,~A~%" x-orig y-orig)
+      (read-n-print-no-hang (plot-stream act-plot))
+      ;; clear area, maybe we should do this always before plotting, i.e. not here?
+      (format (plot-stream act-plot) "clear~%")
+      (read-n-print-no-hang (plot-stream act-plot))
+      (force-output (plot-stream act-plot))
+      (read-n-print-no-hang (plot-stream act-plot))))
   (defun plot-file (data-file)
     "Plot data-file directly, datafile must hold columns separated by spaces, tabs or commas
 \(other separators may work), use with-lines style"
@@ -241,16 +287,16 @@ e.g.:
       (loop for i from 2 to c-num do
          (setf cmd-string (concatenate 'string cmd-string
                                        (format nil ", \"~A\" using ($~A) with lines" data-file i))))
-      (unless stream
-        (setf stream (open-plot)))
-      (format stream "set grid~%")
+      (unless act-plot
+        (setf act-plot (make-plot)))
+      (format (plot-stream act-plot) "set grid~%")
       (when (characterp separator)
-        (format stream "set datafile separator \"~A\"~%" separator))
-      (format stream "~A~%" cmd-string)
+        (format (plot-stream act-plot) "set datafile separator \"~A\"~%" separator))
+      (format (plot-stream act-plot) "~A~%" cmd-string)
       (when (characterp separator)
-        (format stream "set datafile separator~%")) ; reset separator
-      (force-output stream))
-    (read-n-print-no-hang stream))
+        (format (plot-stream act-plot) "set datafile separator~%")) ; reset separator
+      (force-output (plot-stream act-plot)))
+    (read-n-print-no-hang (plot-stream act-plot)))
 )
 
 ;; figure is an alias to new-plot (because it's used that way in octave/matlab)
@@ -441,6 +487,21 @@ ENTER continue, all other characters break and quit demo"
        (format-plot t "set size square 0.5,0.5~%")
        (replot)
        (close-all-plots)
+       (subplot 3 2 1)
+       (plot '(1 2 3 4) '(-1 2 3 4))
+       ;; following command doesn't work yet:
+       ;; (title "Use of multiplots")
+       (subplot 3 2 2)
+       (plot '(1 2 3 4) '(-1 -2 3 4))
+       (subplot 3 2 3)
+       (plot '(1 2 3 4) '(-1 -2 -3 4))
+       (subplot 3 2 4)
+       (plot '(1 2 3 4) '(-1 -2 -3 -4))
+       (subplot 3 2 5)
+       (plot '(1 2 3 4) '(1 -2 3 4))
+       (subplot 3 2 6)
+       (plot '(1 2 3 4) '(1 -2 -3 4))
+       (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
        (when (cl-fad:file-exists-p "data.txt")
