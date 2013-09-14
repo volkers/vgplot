@@ -229,7 +229,8 @@ e.g.:
       (force-output (plot-stream act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
   (defun subplot (rows cols index)
-    "Set up a plot grid with rows by cols subwindows and use location index for next plot command.
+    "(Experimental command, not all features work correctly yet.)
+Set up a plot grid with rows by cols subwindows and use location index for next plot command.
 The plot index runs row-wise.  First all the columns in a row are
 filled and then the next row is filled.
 
@@ -264,9 +265,6 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
       (format (plot-stream act-plot) "set size ~A,~A~%" x-size y-size)
       (read-n-print-no-hang (plot-stream act-plot))
       (format (plot-stream act-plot) "set origin ~A,~A~%" x-orig y-orig)
-      (read-n-print-no-hang (plot-stream act-plot))
-      ;; clear area, maybe we should do this always before plotting, i.e. not here?
-      (format (plot-stream act-plot) "clear~%")
       (read-n-print-no-hang (plot-stream act-plot))
       (force-output (plot-stream act-plot))
       (read-n-print-no-hang (plot-stream act-plot))))
@@ -304,6 +302,7 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 
 (defun replot ()
   "Send the replot command to gnuplot, i.e. apply all recent changes in the plot."
+  (format-plot *debug* "clear~%") ;; maybe only for multiplot needed?
   (format-plot *debug* "replot"))
 
 (defun grid (style &optional (replot? t))
@@ -490,8 +489,9 @@ ENTER continue, all other characters break and quit demo"
        (subplot 3 2 1)
        (plot '(1 2 3 4) '(-1 2 3 4))
        ;; following command doesn't work yet:
-       ;; (title "Use of multiplots")
+       (title "Use of multiplots")
        (subplot 3 2 2)
+       (title "")
        (plot '(1 2 3 4) '(-1 -2 3 4))
        (subplot 3 2 3)
        (plot '(1 2 3 4) '(-1 -2 -3 4))
@@ -501,6 +501,8 @@ ENTER continue, all other characters break and quit demo"
        (plot '(1 2 3 4) '(1 -2 3 4))
        (subplot 3 2 6)
        (plot '(1 2 3 4) '(1 -2 -3 4))
+       (subplot 3 2 3)
+       (axis '(-1 5 nil nil))
        (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
