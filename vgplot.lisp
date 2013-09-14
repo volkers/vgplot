@@ -492,8 +492,8 @@ ENTER continue, all other characters break and quit demo"
        ;; following command doesn't work yet:
        (title "Use of multiplots")
        (subplot 3 2 2)
-       (title "")
        (plot '(1 2 3 4) '(-1 -2 3 4))
+       (title "")
        (subplot 3 2 3)
        (plot '(1 2 3 4) '(-1 -2 -3 4))
        (subplot 3 2 4)
