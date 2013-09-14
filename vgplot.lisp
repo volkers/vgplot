@@ -489,7 +489,6 @@ ENTER continue, all other characters break and quit demo"
        (close-all-plots)
        (subplot 3 2 1)
        (plot '(1 2 3 4) '(-1 2 3 4))
-       ;; following command doesn't work yet:
        (title "Use of multiplots")
        (subplot 3 2 2)
        (plot '(1 2 3 4) '(-1 -2 3 4))
