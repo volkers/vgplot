@@ -23,6 +23,7 @@
 (defvar *debug* nil)
 
 (defstruct plot
+  "Struct holding properties of one plot"
   (stream (open-plot))
   (multiplot nil))
 
