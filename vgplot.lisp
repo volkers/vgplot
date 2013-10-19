@@ -339,6 +339,24 @@ run an additional replot thereafter."
   (when replot?
     (replot)))
 
+(defun text (x y text-string &key (horizontalalignment "left") (rotation 0) )
+  "Add text label text-string at position x,y
+:horizontalalignment \"left\"(default), \"center\" or \"right\"
+:rotation rotate text by this angle in degrees (default 0) [if the terminal can do so]"
+  (format-plot *debug* "set label \"~a\" at ~a,~a ~a rotate by ~a"
+               text-string x y horizontalalignment rotation)
+  (replot))
+
+(defun text-show-label ()
+  "Show text labels. This is useful to get the tag number for (text-delete)"
+  (format-plot t "show label"))
+
+(defun text-delete (tag)
+  "Delete text label specified by tag.
+Tag is the number of the text label you get when running (text-show-label)."
+  (format-plot *debug* "unset label ~a" tag)
+  (replot))
+
 (defun parse-axis (axis-s)
   "Parse gnuplot string e.g.
 \"	set xrange [ * : 4.00000 ] noreverse nowriteback  # (currently [1.00000:] )\"
@@ -469,11 +487,14 @@ ENTER continue, all other characters break and quit demo"
        (plot x y "y = sin(x)")
        (xlabel "[rad]")
        (ylabel "magnitude")
+       (text 0.5 -0.5 "Important point (0.5,-0.5)")
        (axis (list (/ pi 2) 5))
        (axis (list -1 pi -1.2 1.2))
        (axis '(t  nil))
        (axis '(nil nil -1.5 t))
        (grid nil)
+       (text-show-label)
+       (text-delete 1)
        (defvar z)
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")

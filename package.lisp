@@ -44,6 +44,9 @@ GNU General Public License
            :replot
            :range
            :subplot
+           :text
+           :text-delete
+           :text-show-label
            :title
            :xlabel
            :ylabel))
