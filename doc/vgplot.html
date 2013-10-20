@@ -248,12 +248,15 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="text_func" href="#text_func">text</a>
-<span class="lambdalist">x y text-string &key (horizontalalignment left) (rotation 0)</span>
+<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0)</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Add text label text-string at position x,y
-:horizontalalignment "left"(default), "center" or "right"
-:rotation rotate text by this angle in degrees (default 0) [if the terminal can do so]</pre></div></div>
+optional:
+   :tag nr              label number specifying which text label to modify
+                        (integer you get when running (text-show-label))
+   :horizontalalignment "left"(default), "center" or "right"
+   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="text-delete_func" href="#text-delete_func">text-delete</a>

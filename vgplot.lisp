@@ -339,12 +339,20 @@ run an additional replot thereafter."
   (when replot?
     (replot)))
 
-(defun text (x y text-string &key (horizontalalignment "left") (rotation 0) )
+(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) )
   "Add text label text-string at position x,y
-:horizontalalignment \"left\"(default), \"center\" or \"right\"
-:rotation rotate text by this angle in degrees (default 0) [if the terminal can do so]"
-  (format-plot *debug* "set label \"~a\" at ~a,~a ~a rotate by ~a"
-               text-string x y horizontalalignment rotation)
+optional:
+   :tag nr              label number specifying which text label to modify
+                        (integer you get when running (text-show-label))
+   :horizontalalignment \"left\"(default), \"center\" or \"right\"
+   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]"
+  (let ((cmd-str "set label ")
+        (tag-str (and tag (format nil " ~a " tag)))
+        (text-str (format nil " \"~a\" " text-string))
+        (at-str (format nil " at ~a,~a " x y))
+        (al-str (format nil " ~a " horizontalalignment))
+        (rot-str (format nil " rotate by ~a " rotation)))
+    (format-plot *debug* (concatenate 'string cmd-str tag-str text-str at-str al-str rot-str)))
   (replot))
 
 (defun text-show-label ()
@@ -488,13 +496,14 @@ ENTER continue, all other characters break and quit demo"
        (xlabel "[rad]")
        (ylabel "magnitude")
        (text 0.5 -0.5 "Important point (0.5,-0.5)")
+       (text-show-label)
+       (text 0.5 -0.5 "Important point (0.5,-0.5)" :tag 1 :rotation 60)
+       (text-delete 1)
        (axis (list (/ pi 2) 5))
        (axis (list -1 pi -1.2 1.2))
        (axis '(t  nil))
        (axis '(nil nil -1.5 t))
        (grid nil)
-       (text-show-label)
-       (text-delete 1)
        (defvar z)
        (setf z (map 'vector #'cos x))
        (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
