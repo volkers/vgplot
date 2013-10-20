@@ -545,7 +545,7 @@ from vgplot's source directory to your directory")
        (close-all-plots)))))
 
 (defun make-doc ()
-  "Update README and html documentation"
+  "Update README and html documentation. Load cl-api before use."
   (with-open-file (stream "README" :direction :output :if-exists :supersede)
     (write-string (documentation (find-package :vgplot) 't) stream))
   ;; dependency to cl-api not defined in asd-file because I don't want getting
