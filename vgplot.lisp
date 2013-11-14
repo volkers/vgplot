@@ -25,7 +25,8 @@
 (defstruct plot
   "Struct holding properties of one plot"
   (stream (open-plot))
-  (multiplot nil))
+  (multiplot nil)
+  (tmp-file-names))
 
 (defun open-plot ()
   "Start gnuplot process and return stream to gnuplot"
@@ -105,8 +106,22 @@
   "Delete files in tmp-file-list and return nil"
   (when tmp-file-list
     (loop for name in tmp-file-list do
-         (delete-file name)))
+         (when (probe-file name)
+           (delete-file name))))
   nil)
+
+(defun make-del-tmp-file-function (tmp-file-list)
+  "Return a function that removes the files in tmp-file-list."
+  #'(lambda ()
+      (loop for name in tmp-file-list do
+           (when (probe-file name)
+             (delete-file name)))))
+
+(defun add-del-tmp-files-to-exit-hook (tmp-file-list)
+  "If possible, add delete of tmp files to exit hooks.
+\(implemented only on sbcl yet)"
+  #+sbcl (push (make-del-tmp-file-function tmp-file-list) sb-ext:*exit-hooks*)
+  #-sbcl (declare (ignore tmp-file-list)))
 
 (defun get-separator (s)
   "Return the used separator in data string
@@ -149,8 +164,7 @@ could be a variable number of spaces, tabs or the optional separator"
                num))
 
 (let ((plot-list nil)       ; List holding not active plots
-      (act-plot nil)        ; actual plot
-      (tmp-file-names nil)) ; list of temporary filenames
+      (act-plot nil))       ; actual plot
   (defun format-plot (print? text &rest args)
     "Send a command directly to active gnuplot process, return gnuplots response
 print also response to stdout if print? is true"
@@ -168,8 +182,8 @@ print also response to stdout if print? is true"
       (format (plot-stream act-plot) "quit~%")
       (force-output (plot-stream act-plot))
       (close (plot-stream act-plot))
-      (setf act-plot (pop plot-list)))
-    (setf tmp-file-names (del-tmp-files tmp-file-names)))
+      (del-tmp-files (plot-tmp-file-names act-plot))
+      (setf act-plot (pop plot-list))))
   (defun close-all-plots ()
     "Close all connected gnuplots"
     (close-plot)
@@ -179,8 +193,7 @@ print also response to stdout if print? is true"
     "Add a new plot window to a current one."
     (when act-plot
       (push act-plot plot-list)
-      (setf act-plot (make-plot)))
-    (setf tmp-file-names (del-tmp-files tmp-file-names)))
+      (setf act-plot (make-plot))))
   (defun plot (&rest vals)
     "Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
@@ -207,10 +220,12 @@ e.g.:
    (plot x y \"r+;red values;\") plots y = f(x) as red points with the
                                  label \"red values\"
 "
-    (unless act-plot
-      (setf act-plot (make-plot)))
-    (setf tmp-file-names (del-tmp-files tmp-file-names))
-    ;; todo: how to always delete temp files?
+    (if act-plot
+        (unless (plot-multiplot act-plot)
+          ;; delete tmp files only when not multiplot
+          ;; in multiplot you may need them again in another subplot
+          (setf (plot-tmp-file-names act-plot) (del-tmp-files (plot-tmp-file-names act-plot))))
+        (setf act-plot (make-plot)))
     (let ((val-l (parse-vals (vectorize vals)))
           (plt-cmd nil))
       (loop for pl in val-l do
@@ -219,15 +234,16 @@ e.g.:
                        (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
                        (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
                                           (first pl) (second pl))))
-                 tmp-file-names)
+                 (plot-tmp-file-names act-plot))
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
                                       (format nil "\"~A\" ~A"
-                                              (first tmp-file-names) (parse-label (third pl))))))
+                                              (first (plot-tmp-file-names act-plot)) (parse-label (third pl))))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
-      (force-output (plot-stream act-plot)))
+      (force-output (plot-stream act-plot))
+      (add-del-tmp-files-to-exit-hook (plot-tmp-file-names act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
   (defun subplot (rows cols index)
     "(Experimental command, not all features work correctly yet.)
