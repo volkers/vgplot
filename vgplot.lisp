@@ -547,8 +547,6 @@ ENTER continue, all other characters break and quit demo"
        (plot '(1 2 3 4) '(1 -2 3 4))
        (subplot 3 2 6)
        (plot '(1 2 3 4) '(1 -2 -3 4))
-       (subplot 3 2 3)
-       (axis '(-1 5 nil nil))
        (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
