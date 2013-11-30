@@ -221,10 +221,7 @@ e.g.:
                                  label \"red values\"
 "
     (if act-plot
-        (unless (plot-multiplot act-plot)
-          ;; delete tmp files only when not multiplot
-          ;; in multiplot you may need them again in another subplot
-          (setf (plot-tmp-file-list act-plot) (del-tmp-files (plot-tmp-file-list act-plot))))
+        (setf (plot-tmp-file-list act-plot) (del-tmp-files (plot-tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
     (let ((val-l (parse-vals (vectorize vals)))
           (plt-cmd nil))
