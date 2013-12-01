@@ -447,16 +447,16 @@ without limit-list do return current axis."
 \(range limit\) return natural numbers below limit
 \(range start limit\) return ordinary numbers starting with start below limit
 \(range start limit step\) return numbers starting with start, successively adding step untill reaching limit \(excluding\)"
-  (apply 'vector (let ((start)
-                       (limit))
-                   (if b
-                       (setf start a
-                             limit b)
-                       (setf start 0
-                             limit a))
-                   (if (> limit start)
-                       (loop for i from start below limit by step collect i)
-                       (loop for i from start above limit by step collect i)))))
+  (let ((len) (vec))
+    (unless b
+      (setf b a
+            a 0))
+    (setf len (ceiling (/ (- b a) step)))
+    (setf vec (make-array len))
+    (loop for i below len do
+         (setf (svref vec i) a)
+         (incf a step))
+    vec))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; utilities for demo and demo
