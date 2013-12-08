@@ -43,6 +43,8 @@ GNU General Public License
            :plot-file
            :replot
            :range
+           :stairs
+           :stairs-no-plot
            :subplot
            :text
            :text-delete

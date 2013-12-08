@@ -163,6 +163,64 @@ could be a variable number of spaces, tabs or the optional separator"
                            (setf sep nil)))))
                num))
 
+(defun stairs (yx &optional y)
+  "Produce a stairstep plot.
+Plot sequence y against sequence yx, if 2 arguments are given.
+If only one argument is given plot sequence yx against the indices.
+
+If you only want to prepare the sequences for later plot, see
+function stairs-no-plot."
+  (multiple-value-bind (x y) (values-list (stairs-no-plot yx y))
+    (plot x y)))
+
+(defun stairs-no-plot (yx &optional y)
+  "Prepare a stairstep plot, but don't actually plot it.
+Return a list of 2 sequences, x and y, usable for the later plot.
+
+If one argument is given use it as y sequence, there x are the indices.
+If both arguments are given use yx as x and y is y.
+
+If you want to plot the stairplot directly, see function stairs."
+  (cond
+    ((not y)
+     (let* ((y (coerce yx 'vector))
+            (len (length y))
+            (x (range len)))
+       (stairs-no-plot x y)))
+    ((not (simple-vector-p yx))
+     (stairs-no-plot (coerce yx 'vector) (coerce y 'vector)))
+    (t (let*
+           ((len (min (length yx) (length y)))
+            (xx (make-array (1- (* 2 len))))
+            (yy (make-array (1- (* 2 len))))
+            (xi 0)
+            (yi 0)
+            (i 1))
+    (if (= len 1)
+        (list yx y)
+        (progn
+          ;; setup start
+          ;; x0 y0
+          ;;    y0
+          (setf (svref xx xi) (svref yx 0))
+          (setf (svref yy yi) (svref y 0))
+          (setf (svref yy (incf yi)) (svref y 0))
+          ;; main loop
+          (loop for ii from 1 below (1- len) do
+               (progn
+                 (setf (svref xx (incf xi)) (svref yx i))
+                 (setf (svref xx (incf xi)) (svref yx i))
+                 (setf (svref yy (incf yi)) (svref y i))
+                 (setf (svref yy (incf yi)) (svref y i))
+                 (incf i)))
+          ;; and finalize
+          ;; xl
+          ;; xl yl
+          (setf (svref xx (incf xi)) (svref yx i))
+          (setf (svref yy (incf yi)) (svref y i))
+          (setf (svref xx (incf xi)) (svref yx i))
+          (list xx yy)))))))
+
 (let ((plot-list nil)       ; List holding not active plots
       (act-plot nil))       ; actual plot
   (defun format-plot (print? text &rest args)
@@ -544,6 +602,9 @@ ENTER continue, all other characters break and quit demo"
        (plot '(1 2 3 4) '(1 -2 3 4))
        (subplot 3 2 6)
        (plot '(1 2 3 4) '(1 -2 -3 4))
+       (close-plot)
+       (vgplot:stairs #(0 4 6.5 6.8 6.5 6.2 6.1 6.05 6.0 6.0))
+       (title "Example of a stairstep plot")
        (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")

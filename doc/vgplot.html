@@ -226,6 +226,31 @@ e.g.:
 <pre>Send the replot command to gnuplot, i.e. apply all recent changes in the plot.</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
+<a class="symbolname" name="stairs_func" href="#stairs_func">stairs</a>
+<span class="lambdalist">yx &optional y</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Produce a stairstep plot.
+Plot sequence y against sequence yx, if 2 arguments are given.
+If only one argument is given plot sequence yx against the indices.
+
+If you only want to prepare the sequences for later plot, see
+function stairs-no-plot.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="stairs-no-plot_func" href="#stairs-no-plot_func">stairs-no-plot</a>
+<span class="lambdalist">yx &optional y</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Prepare a stairstep plot, but don't actually plot it.
+Return a list of 2 sequences, x and y, usable for the later plot.
+
+If one argument is given use it as y sequence, there x are the indices.
+If both arguments are given use yx as x and y is y.
+
+If you want to plot the stairplot directly, see function stairs.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
 <a class="symbolname" name="subplot_func" href="#subplot_func">subplot</a>
 <span class="lambdalist">rows cols index</span>
 <span class="symboltype">function</span></div>
