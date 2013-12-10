@@ -40,5 +40,16 @@
   (assert-equal 2 (vgplot::count-data-columns "		1.7e179 ; 87654321 # comment" #\;))
 )
 
+(define-test test-stairs-no-plot
+  (assert-equalp (list #(0) #(1)) (vgplot:stairs-no-plot #(1)))
+  (assert-equalp '(#(0 1 1 2 2 3 3 4 4) #(3 3 2 2 7 7 1 1 6))
+                 (vgplot:stairs-no-plot #(3 2 7 1 6)))
+  (assert-equalp '(#(0 1 1 2 2 3 3 4 4) #(3 3 2 2 7 7 1 1 6))
+                 (vgplot:stairs-no-plot '(3 2 7 1 6)))
+  (assert-equalp '(#(0 1 1 2 2 3 3 4 4) #(3 3 2 2 7 7 1 1 6))
+                 (vgplot:stairs-no-plot '(0 1 2 3 4) '(3 2 7 1 6)))
+  (assert-equalp '(#(1 3 3) #(4.0 4.0 -1))
+                 (vgplot:stairs-no-plot #(1 3) #(4.0 -1))))
+
 (defun run ()
   (lisp-unit:run-tests :all :vgplot-test))
