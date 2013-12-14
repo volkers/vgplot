@@ -64,7 +64,7 @@
     (t nil)))
 
 (defun parse-label (lbl)
-  "Parse label string e.g. \"-k;label;\" and return accordinggnuplot style command string."
+  "Parse label string e.g. \"-k;label;\" and return according gnuplot style command string."
   (let ((style "lines")
         (color "red")
         (title "")
@@ -187,7 +187,7 @@ If you want to plot the stairplot directly, see function stairs."
             (len (length y))
             (x (range len)))
        (stairs-no-plot x y)))
-    ((not (simple-vector-p yx))
+    ((or (not (simple-vector-p yx)) (not (simple-vector-p y)))
      (stairs-no-plot (coerce yx 'vector) (coerce y 'vector)))
     (t (let*
            ((len (min (length yx) (length y)))
