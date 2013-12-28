@@ -273,7 +273,7 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="text_func" href="#text_func">text</a>
-<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0)</span>
+<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize)</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Add text label text-string at position x,y
@@ -281,7 +281,18 @@ optional:
    :tag nr              label number specifying which text label to modify
                         (integer you get when running (text-show-label))
    :horizontalalignment "left"(default), "center" or "right"
-   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]</pre></div></div>
+   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]
+   :font "<name>" use this font, e.g. :font "Times" [terminal depending, gnuplot help
+                        recommends: http://fontconfig.org/fontconfig-user.html for more information]
+   :fontsize nr
+
+Observe, it could alter the font of the labels (aka legend or key in
+gnuplot terms) if you change font or fontsize of a text field. To
+explicitly chose fontsize (or font) for the label you could use:
+
+(format-plot t "set key font \",10\"")
+(replot)
+</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="text-delete_func" href="#text-delete_func">text-delete</a>

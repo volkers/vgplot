@@ -410,20 +410,33 @@ run an additional replot thereafter."
   (when replot?
     (replot)))
 
-(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) )
+(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize))
   "Add text label text-string at position x,y
 optional:
    :tag nr              label number specifying which text label to modify
                         (integer you get when running (text-show-label))
    :horizontalalignment \"left\"(default), \"center\" or \"right\"
-   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]"
+   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]
+   :font \"<name>\" use this font, e.g. :font \"Times\" [terminal depending, gnuplot help
+                        recommends: http://fontconfig.org/fontconfig-user.html for more information]
+   :fontsize nr
+
+Observe, it could alter the font of the labels (aka legend or key in
+gnuplot terms) if you change font or fontsize of a text field. To
+explicitly chose fontsize (or font) for the label you could use:
+
+\(format-plot t \"set key font \\\",10\\\"\"\)
+\(replot\)
+"
   (let ((cmd-str "set label ")
         (tag-str (and tag (format nil " ~a " tag)))
         (text-str (format nil " \"~a\" " text-string))
         (at-str (format nil " at ~a,~a " x y))
         (al-str (format nil " ~a " horizontalalignment))
-        (rot-str (format nil " rotate by ~a " rotation)))
-    (format-plot *debug* (concatenate 'string cmd-str tag-str text-str at-str al-str rot-str)))
+        (rot-str (format nil " rotate by ~a " rotation))
+        (font-str (and (or font fontsize)
+                       (format nil " font \"~a,~a\" " (or font "") (or fontsize "")))))
+    (format-plot *debug* (concatenate 'string cmd-str tag-str text-str at-str al-str rot-str font-str)))
   (replot))
 
 (defun text-show-label ()
@@ -568,7 +581,9 @@ ENTER continue, all other characters break and quit demo"
        (ylabel "magnitude")
        (text 0.5 -0.5 "Important point (0.5,-0.5)")
        (text-show-label)
-       (text 0.5 -0.5 "Important point (0.5,-0.5)" :tag 1 :rotation 60)
+       (text 0.5 -0.5 "Important point (0.5,-0.5)" :tag 1 :rotation 60 :font "Times" :fontsize 14)
+       (format-plot t "set key font \",10\"")
+       (replot)
        (text-delete 1)
        (axis (list (/ pi 2) 5))
        (axis (list -1 pi -1.2 1.2))
