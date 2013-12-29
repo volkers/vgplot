@@ -177,7 +177,7 @@ If key parameter replot is true (default) run an additional replot thereafter.</
 <pre>Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
                x y                plot y = f(x)
-               x y lable-string   plot y = f(x) using lable-string as label
+               x y label-string   plot y = f(x) using label-string as label
                following parameters add curves to same plot e.g.:
                x y label x1 y1 label1 ...
 label:
@@ -227,12 +227,17 @@ e.g.:
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="stairs_func" href="#stairs_func">stairs</a>
-<span class="lambdalist">yx &optional y</span>
+<span class="lambdalist">&rest vals</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Produce a stairstep plot.
-Plot sequence y against sequence yx, if 2 arguments are given.
-If only one argument is given plot sequence yx against the indices.
+vals could be: y                  plot y over its index
+               x y                plot y = f(x)
+               x y label-string   plot y = f(x) using label-string as label
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+
+For the syntax of label-string see documentation of plot command.
 
 If you only want to prepare the sequences for later plot, see
 function stairs-no-plot.</pre></div></div>

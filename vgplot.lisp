@@ -163,15 +163,39 @@ could be a variable number of spaces, tabs or the optional separator"
                            (setf sep nil)))))
                num))
 
-(defun stairs (yx &optional y)
+(defun stairs (&rest vals)
   "Produce a stairstep plot.
-Plot sequence y against sequence yx, if 2 arguments are given.
-If only one argument is given plot sequence yx against the indices.
+vals could be: y                  plot y over its index
+               x y                plot y = f(x)
+               x y label-string   plot y = f(x) using label-string as label
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+
+For the syntax of label-string see documentation of plot command.
 
 If you only want to prepare the sequences for later plot, see
 function stairs-no-plot."
-  (multiple-value-bind (x y) (values-list (stairs-no-plot yx y))
-    (plot x y)))
+  (let ((par-list))
+    (labels ((construct-plist (p-list pars)
+               (cond
+                 ((null pars)
+                  (nreverse p-list))
+                 ((stringp (first pars))
+                  (push (first pars) p-list)
+                  (construct-plist p-list (rest pars)))
+                 ((= 1 (length pars))
+                  (multiple-value-bind (x y) (values-list (stairs-no-plot
+                                                           (first pars)))
+                    (push x p-list)
+                    (push y p-list)
+                    (construct-plist p-list (rest pars))))
+                 (t
+                  (multiple-value-bind (x y) (values-list (stairs-no-plot
+                                                           (first pars) (second pars)))
+                    (push x p-list)
+                    (push y p-list)
+                    (construct-plist p-list (rest (rest pars))))))))
+      (apply #'plot (construct-plist par-list (vectorize vals))))))
 
 (defun stairs-no-plot (yx &optional y)
   "Prepare a stairstep plot, but don't actually plot it.
@@ -256,7 +280,7 @@ print also response to stdout if print? is true"
     "Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
                x y                plot y = f(x)
-               x y lable-string   plot y = f(x) using lable-string as label
+               x y label-string   plot y = f(x) using label-string as label
                following parameters add curves to same plot e.g.:
                x y label x1 y1 label1 ...
 label:
@@ -618,8 +642,11 @@ ENTER continue, all other characters break and quit demo"
        (subplot 3 2 6)
        (plot #(1 2 3 4) #(1 -2 -3 4))
        (close-plot)
-       (vgplot:stairs #(0 4 6.5 6.8 6.5 6.2 6.1 6.05 6.0 6.0))
+       (setf y #(0 4 6.5 6.8 6.5 6.2 6.1 6.05 6.0 6.0))
+       (vgplot:stairs y)
        (title "Example of a stairstep plot")
+       (setf x (range (length y)))
+       (vgplot:stairs x y "line 1" '(0 1 10) '(0 6 6) "k;line 2;")
        (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
