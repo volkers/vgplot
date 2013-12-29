@@ -1,13 +1,9 @@
 open tasks:
 
-- how to remove dat-file and close stream if user closes gnuplot by closing the window?
-
 - (more than one gnuplot instance) it would be good to apply commands
   to the other plot-figure if the user focuses to another plot window
 
 - implement other API commands
-
-- implement test
 
 - avoid the (ltk-) warnings when loading the lib; should I implement
   do-execute by myself?
