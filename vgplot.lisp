@@ -606,6 +606,7 @@ ENTER continue, all other characters break and quit demo"
        (text 0.5 -0.5 "Important point (0.5,-0.5)")
        (text-show-label)
        (text 0.5 -0.5 "Important point (0.5,-0.5)" :tag 1 :rotation 60 :font "Times" :fontsize 14)
+       ;; following 2 lines change label font back
        (format-plot t "set key font \",10\"")
        (replot)
        (text-delete 1)
