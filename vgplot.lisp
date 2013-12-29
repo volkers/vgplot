@@ -377,37 +377,37 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
   (format-plot *debug* "clear~%") ;; maybe only for multiplot needed?
   (format-plot *debug* "replot"))
 
-(defun grid (style &optional (replot? t))
+(defun grid (style &key (replot t))
   "Add grid to plot if style t, otherwise remove grid.
-If the optional parameter replot? is true (default) run an additional replot thereafter."
+If key parameter replot is true (default) run an additional replot thereafter."
   (if style
       (format-plot *debug* "set grid")
       (format-plot *debug* "unset grid"))
-  (when replot?
+  (when replot
     (replot)))
 
-(defun title (str &optional (replot? t))
-  "Add title str to plot. If the optional parameter replot? is true (default)
+(defun title (str &key (replot t))
+  "Add title str to plot. If key parameter replot is true (default)
 run an additional replot thereafter."
   (format-plot *debug* "set title \"~A\"" str)
   (format-plot *debug* "show title")
-  (when replot?
+  (when replot
     (replot)))
 
-(defun xlabel (str &optional (replot? t))
-  "Add x axis label. If the optional parameter replot? is true (default)
+(defun xlabel (str &key (replot t))
+  "Add x axis label. If key parameter replot is true (default)
 run an additional replot thereafter."
   (format-plot *debug* "set xlabel \"~A\"" str)
   (format-plot *debug* "show xlabel")
-  (when replot?
+  (when replot
     (replot)))
 
-(defun ylabel (str &optional (replot? t))
-  "Add y axis label. If the optional parameter replot? is true (default)
+(defun ylabel (str &key (replot t))
+  "Add y axis label. If key parameter replot is true (default)
 run an additional replot thereafter."
   (format-plot *debug* "set ylabel \"~A\"" str)
   (format-plot *debug* "show ylabel")
-  (when replot?
+  (when replot
     (replot)))
 
 (defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize))
