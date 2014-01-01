@@ -663,8 +663,8 @@ ENTER continue, all other characters break and quit demo"
                 (yd (map 'vector #'e-fun xd))
                 (sampled (stairs-no-plot xd yd)))
            (plot x y "b;continuous;"
-                        (first sampled) (second sampled) "sampled")))
-       (title "Example of a mixture of continuous and discrete characteristics")
+                        (first sampled) (second sampled) "sampled"))
+         (title "Example of a mixture of continuous and discrete characteristics"))
        (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
