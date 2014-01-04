@@ -26,7 +26,7 @@ and see API documentation in doc/vgplot.html
 
 ## License
 
-Copyright (C) 2013 Volker Sarodnick
+Copyright (C) 2013, 2014 Volker Sarodnick
 
 GNU General Public License
 ")
