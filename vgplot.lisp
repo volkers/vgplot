@@ -70,6 +70,9 @@
         (title "")
         (start-title (or (search ";" lbl) -1)) ;; -1 because subseq jumps over first ;
         (end-title (or (search ";" lbl :from-end t) (length lbl))))
+    (when (>= start-title end-title)
+      ;; only one semicolon found, use the part after the first one as title
+      (setf end-title (length lbl)))
     (setf title (subseq lbl (1+ start-title) end-title))
     (when (> start-title 0)
       (loop for c across (subseq lbl 0 start-title) do
