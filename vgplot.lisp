@@ -601,8 +601,11 @@ ENTER continue, all other characters break and quit demo"
     (print-n-run-list
      '( ;; add demo commands here
        (plot '(0 -2 17))
-       (plot #(1 2 3) #(0 -2 -17) ";silly example;")
-       (title "Simple curve")
+       (text 0.2 10 "You can plot a list directly against its index\\n(text x y) adds a string")
+       (progn
+         (plot #(1 2 3) #(0 -2 -17) ";silly example;")
+         (title "Simple curve")
+         (text 1.2 -14 "Plot vectors with legend and add a title"))
        (progn
          (defvar x)
          (defvar y)
@@ -610,32 +613,54 @@ ENTER continue, all other characters break and quit demo"
          (setf y (map 'vector #'sin x))
          (plot x y "y = sin(x)")
          (xlabel "[rad]")
-         (ylabel "magnitude"))
-       (text 0.5 -0.5 "Important point (0.5,-0.5)")
-       (text-show-label)
+         (ylabel "magnitude")
+         (text 0.2 -0.6 "Use function range to create vectors and add labels to axes"))
+       (and "text-show-labels shows the active labels and their tags"
+        (text-show-label))
+       (and "Usefull to delete or change labels"
+        (text-delete 1 2 3))
+       (text 0.5 -0.5 "You can use a different size" :fontsize 14)
        (progn
-         (text 0.5 -0.5 "Important point (0.5,-0.5)" :tag 1 :rotation 60 :font "Times" :fontsize 14)
-         ;; following 2 lines change label font back
+         (text 0.5 -0.5 "You can change a present label"
+               :tag 1 :rotation 60 :font "Times" :fontsize 12)
+         (and "font definitions for text change also the font of the legend,
+the following is needed to change the keys back")
          (format-plot t "set key font \",10\"")
          (replot))
-       (text-delete 1)
-       (axis (list (/ pi 2) 5))
-       (axis (list -1 pi -1.2 1.2))
-       (axis '(t  nil))
-       (axis '(nil nil -1.5 t))
-       (grid nil)
+       (progn
+         (text-delete 1)
+         (text 3 0.5 "axis can change the range of the x axis")
+         (axis (list (/ pi 2) 5)))
+       (progn
+         (text -0.5 -0.5 "axis can also change the range of both x and y axis" :tag 1)
+         (axis (list -1 pi -1.2 1.2)))
+       (progn
+         (text 0.5 -0.5 "t means autoscale and nil unchanged corresponding axis" :tag 1)
+         (axis '(t  nil)))
+       (progn
+         (text 0.5 -0.5 "another example of the use of axis" :tag 1)
+         (axis '(nil nil -1.5 t)))
+       (progn
+         (text 0.5 -0.5 "Remove the grid" :tag 1)
+         (grid nil))
+       (and "close-plot closes the actual plot"
+        (close-plot))
        (progn
          (defvar z)
          (setf z (map 'vector #'cos x))
          (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
-         (axis '(t t t t))
-         (title "Some Angular Graphs"))
-       (new-plot)
-       (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
-       (plot x y "+k;y = cos(2x) (new-plot);")
-       (plot x y "og;y = cos(2x) (new-plot);")
+         (title "Some Other Graphs"))
        (progn
-         (or "(format-plot) allows direct commands to the running gnuplot process")
+         (new-plot)
+         (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
+         (plot x y "+k;y = cos(2x) (new-plot);")
+         (text 0.5 -0.5 "new-plot adds a new plot window"))
+       (text-show-label)
+       (progn
+         (plot x y "og;y = cos(2x) (new-plot);")
+         (text 0.5 0.5 "Different line style" :tag 1))
+       (progn
+         (and "(format-plot) allows direct commands to the running gnuplot process")
          (format-plot t "set size square 0.5,0.5~%")
          (replot))
        (close-all-plots)
@@ -680,7 +705,8 @@ from vgplot's source directory to your directory")
        (when (cl-fad:file-exists-p "data.csv")
          (plot-file "data.csv"))
        (when (cl-fad:file-exists-p "data.csv")
-         (plot (first (load-data-file "data.csv"))))
+         (plot (first (load-data-file "data.csv")))
+         (text 2 -1 "load-data-file returns data from a csv file"))
        (close-all-plots)))))
 
 (defun make-doc ()
