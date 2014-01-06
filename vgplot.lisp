@@ -473,10 +473,11 @@ explicitly chose fontsize (or font) for the label you could use:
   "Show text labels. This is useful to get the tag number for (text-delete)"
   (format-plot t "show label"))
 
-(defun text-delete (tag)
-  "Delete text label specified by tag.
-Tag is the number of the text label you get when running (text-show-label)."
-  (format-plot *debug* "unset label ~a" tag)
+(defun text-delete (&rest tags)
+  "Delete text labels specified by tags.
+A tag is the number of the text label you get when running (text-show-label)."
+  (loop for tag in tags do
+       (format-plot *debug* "unset label ~a" tag))
   (replot))
 
 (defun parse-axis (axis-s)
