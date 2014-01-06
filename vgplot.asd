@@ -7,7 +7,8 @@
   :license "GPL"
   :depends-on (:ltk :cl-fad :cl-ppcre)
   :components ((:file "package")
-               (:file "vgplot")))
+               (:file "vgplot")
+               (:file "demo")))
 
 (asdf:defsystem :vgplot-test
   :serial t
