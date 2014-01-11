@@ -125,9 +125,10 @@
 
 (defun add-del-tmp-files-to-exit-hook (tmp-file-list)
   "If possible, add delete of tmp files to exit hooks.
-\(implemented only on sbcl yet)"
+\(implemented on sbcl and clisp)"
   #+sbcl (push (make-del-tmp-file-function tmp-file-list) sb-ext:*exit-hooks*)
-  #-sbcl (declare (ignore tmp-file-list)))
+  #+clisp (push (make-del-tmp-file-function tmp-file-list) custom:*fini-hooks*)
+  #-(or sbcl clisp) (declare (ignore tmp-file-list)))
 
 (defun get-separator (s)
   "Return the used separator in data string
