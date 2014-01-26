@@ -3,7 +3,7 @@
 (asdf:defsystem :vgplot
   :serial t
   :description "Interface to gnuplot"
-  :author "Volker Sarodnick <volkersar@gmx.net>"
+  :author "Volker Sarodnick"
   :license "GPL"
   :depends-on (:ltk :cl-fad :cl-ppcre)
   :components ((:file "package")
@@ -13,7 +13,7 @@
 (asdf:defsystem :vgplot-test
   :serial t
   :description "Test environment for vgplot"
-  :author "Volker Sarodnick <volkersar@gmx.net>"
+  :author "Volker Sarodnick"
   :license "GPL"
   :depends-on (:vgplot :lisp-unit)
   :components ((:file "package-test")
