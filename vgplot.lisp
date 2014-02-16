@@ -67,7 +67,7 @@
     (t nil)))
 
 (defun parse-label (lbl)
-  "Parse label string e.g. \"-k;label;\" and return according gnuplot style command string."
+  "Parse label string e.g. \"-k;label;\" and return key list (list :style style :color color :title title)."
   (let ((style "lines")
         (color "red")
         (title "")
@@ -89,7 +89,7 @@
              (#\b (setf color "blue"))
              (#\c (setf color "cyan"))
              (#\k (setf color "black")))))
-    (format nil "with ~A linecolor rgb \"~A\" title \"~A\" " style color title)))
+    (list :style style :color color :title title)))
 
 (defun parse-floats (s sep)
   "Parse string s and return the found numbers separated by separator"
@@ -324,8 +324,9 @@ e.g.:
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
-                                      (format nil "\"~A\" ~A"
-                                              (first (tmp-file-list act-plot)) (parse-label (third pl))))))
+                                      (destructuring-bind (&key style color title) (parse-label (third pl))
+                                        (format nil "\"~A\" with ~A linecolor rgb \"~A\" title \"~A\" "
+                                              (first (tmp-file-list act-plot)) style color title)))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
