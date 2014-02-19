@@ -156,6 +156,9 @@ the following is needed to change the keys back")
                         (first sampled) (second sampled) "sampled"))
          (title "Example of a mixture of continuous and discrete characteristics"))
        (close-plot)
+       (progn
+         (bar #(0.2 0.5 -0.3 0.8 0.3) "b;amount;")
+         (title "Example for a bar plot"))
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
        (when (cl-fad:file-exists-p "data.txt")

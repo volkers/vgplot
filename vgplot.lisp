@@ -20,7 +20,7 @@
 
 (in-package #:vgplot)
 
-(defvar *debug* nil)
+(defvar *debug* t)
 
 (defclass plots ()
   ((plot-stream :initform (open-plot) :accessor plot-stream)
@@ -61,6 +61,8 @@
   (cond
     ((stringp (third vals)) (cons (list (pop vals) (pop vals) (pop vals))
                                   (parse-vals vals)))
+    ((stringp (second vals)) (cons (list (pop vals) nil (pop vals))
+                                   (parse-vals vals)))
     ((second vals) (cons (list (pop vals) (pop vals) "")
                          (parse-vals vals)))
     (vals (list (list (first vals) nil ""))) ;; special case of plot val to index, i.e. only y exist
@@ -286,6 +288,7 @@ print also response to stdout if print? is true"
   (defun plot (&rest vals)
     "Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
+               y label-string     plot y over its index using label-string as label
                x y                plot y = f(x)
                x y label-string   plot y = f(x) using label-string as label
                following parameters add curves to same plot e.g.:
@@ -319,7 +322,7 @@ e.g.:
                    (if (null (second pl)) ;; special case plotting to index
                        (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
                        (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                                          (first pl) (second pl))))
+                            (first pl) (second pl))))
                  (tmp-file-list act-plot))
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
@@ -328,6 +331,54 @@ e.g.:
                                         (format nil "\"~A\" with ~A linecolor rgb \"~A\" title \"~A\" "
                                               (first (tmp-file-list act-plot)) style color title)))))
       (format (plot-stream act-plot) "set grid~%")
+      (format (plot-stream act-plot) "~A~%" plt-cmd)
+      (force-output (plot-stream act-plot))
+      (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
+    (read-n-print-no-hang (plot-stream act-plot)))
+  (defun bar (&rest vals)
+    "Create a bar plot y = f(x) on active plot, create plot if needed.
+vals could be: y                  plot y over its index
+               y label-string     plot y over its index using label-string as label
+               x y                plot y = f(x)
+               x y label-string   plot y = f(x) using label-string as label
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+label:
+A simple label in form of \"text\" is printed directly.
+
+A label with added style commands: label in form \"styles;text;\":
+styles can be following colors:
+   \"r\" red
+   \"g\" green
+   \"b\" blue
+   \"c\" cyan
+   \"k\" black
+
+e.g.:
+   (bar x y \"r;red values;\") bar plot y = f(x) with red boxes and label \"red values\"
+"
+    (if act-plot
+        (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
+        (setf act-plot (make-plot)))
+    (let ((val-l (parse-vals (vectorize vals)))
+          (plt-cmd nil))
+      (loop for pl in val-l do
+           (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+                   (if (null (second pl))  ;; special case plotting to index
+                       (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
+                       (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
+                            (first pl) (second pl))))
+                 (tmp-file-list act-plot))
+           (setf plt-cmd (concatenate 'string (if plt-cmd
+                                                  (concatenate 'string plt-cmd ", ")
+                                                  "plot ")
+                                      (destructuring-bind (&key style color title) (parse-label (third pl))
+                                        (declare (ignore style))
+                                        (format nil "\"~A\" with boxes linecolor rgb \"~A\" title \"~A\" "
+                                                (first (tmp-file-list act-plot)) color title)))))
+      (format (plot-stream act-plot) "set grid~%")
+      (format (plot-stream act-plot) "set boxwidth 0.8 absolute~%")
+      (format (plot-stream act-plot) "set style fs solid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
