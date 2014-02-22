@@ -56,8 +56,21 @@
                             (coerce x 'vector)))
           vals))
 
+(defun min-x-diff (x-l)
+  "Return minimal difference between 2 consecutive elements in x.
+Throw an error if x is not increasing, i.e. difference not bigger than 0"
+  (let ((min-diff (reduce #'min (map 'vector #'- (subseq x-l 1) x-l))))
+    (assert (< 0 min-diff) nil "X has to be increasing")
+    min-diff))
+
+(defun extract-min-x-diff (l)
+  "l is a list in the form ((x y lbl-string) (x1 y1 lbl-string)...).
+Return minimal difference of two consecutive x values"
+  (reduce #'min (map 'list #'min-x-diff (map 'list #'first l))))
+
 (defun parse-vals (vals)
-  "Parse input values to plot and return grouped list: ((x y lbl-string) (x1 y1 lbl-string)...)"
+  "Parse input values to plot and return grouped list: ((x y lbl-string) (x1 y1 lbl-string)...)
+For efficiency reasons return ((y nil lbl-string)(...)) if only y given"
   (cond
     ((stringp (third vals)) (cons (list (pop vals) (pop vals) (pop vals))
                                   (parse-vals vals)))
@@ -66,6 +79,21 @@
     ((second vals) (cons (list (pop vals) (pop vals) "")
                          (parse-vals vals)))
     (vals (list (list (first vals) nil ""))) ;; special case of plot val to index, i.e. only y exist
+    (t nil)))
+
+(defun parse-bar-vals (vals)
+  "Parse input values to plot and return grouped list: ((x y lbl-string) (x1 y1 lbl-string)...)
+Create x if not existing."
+  (cond
+    ((stringp (third vals)) (cons (list (pop vals) (pop vals) (pop vals))
+                                  (parse-bar-vals vals)))
+    ;; insert x if only y given
+    ((stringp (second vals)) (cons (list (range (length (first vals))) (pop vals) (pop vals))
+                                   (parse-bar-vals vals)))
+    ((second vals) (cons (list (pop vals) (pop vals) "")
+                         (parse-bar-vals vals)))
+    ;; insert x because only y given
+    (vals (list (list (range (length (first vals))) (first vals) "")))
     (t nil)))
 
 (defun parse-label (lbl)
@@ -360,14 +388,15 @@ e.g.:
     (if act-plot
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
-    (let ((val-l (parse-vals (vectorize vals)))
-          (plt-cmd nil))
+    (let* ((val-l (parse-bar-vals (vectorize vals)))
+           (plt-cmd)
+           (x-diff-min (extract-min-x-diff val-l))
+           (n-bars (length val-l))
+           (boxwidth (* 0.8 (/ x-diff-min n-bars))))
       (loop for pl in val-l do
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
-                   (if (null (second pl))  ;; special case plotting to index
-                       (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
-                       (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                            (first pl) (second pl))))
+                   (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
+                            (first pl) (second pl)))
                  (tmp-file-list act-plot))
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
@@ -377,7 +406,7 @@ e.g.:
                                         (format nil "\"~A\" with boxes linecolor rgb \"~A\" title \"~A\" "
                                                 (first (tmp-file-list act-plot)) color title)))))
       (format (plot-stream act-plot) "set grid~%")
-      (format (plot-stream act-plot) "set boxwidth 0.8 absolute~%")
+      (format (plot-stream act-plot) "set boxwidth ~A absolute~%" boxwidth)
       (format (plot-stream act-plot) "set style fs solid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
