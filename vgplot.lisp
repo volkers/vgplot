@@ -20,7 +20,7 @@
 
 (in-package #:vgplot)
 
-(defvar *debug* t)
+(defvar *debug* nil)
 
 (defclass plots ()
   ((plot-stream :initform (open-plot) :accessor plot-stream)
@@ -392,12 +392,14 @@ e.g.:
            (plt-cmd)
            (x-diff-min (extract-min-x-diff val-l))
            (n-bars (length val-l))
-           (boxwidth (* 0.8 (/ x-diff-min n-bars))))
+           (boxwidth (* 0.8 (/ x-diff-min n-bars)))
+           (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
       (loop for pl in val-l do
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                            (first pl) (second pl)))
+                            (map 'vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (first pl)) (second pl)))
                  (tmp-file-list act-plot))
+           (incf bar-offset)
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
