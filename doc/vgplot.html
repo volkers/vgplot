@@ -102,33 +102,6 @@ values can be:
 without limit-list do return current axis.</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
-<a class="symbolname" name="bar_func" href="#bar_func">bar</a>
-<span class="lambdalist">&rest vals</span>
-<span class="symboltype">function</span></div>
-<div class="documentation">
-<pre>Create a bar plot y = f(x) on active plot, create plot if needed.
-vals could be: y                  plot y over its index
-               y label-string     plot y over its index using label-string as label
-               x y                plot y = f(x)
-               x y label-string   plot y = f(x) using label-string as label
-               following parameters add curves to same plot e.g.:
-               x y label x1 y1 label1 ...
-label:
-A simple label in form of "text" is printed directly.
-
-A label with added style commands: label in form "styles;text;":
-styles can be following colors:
-   "r" red
-   "g" green
-   "b" blue
-   "c" cyan
-   "k" black
-
-e.g.:
-   (bar x y "r;red values;") bar plot y = f(x) with red boxes and label "red values"
-</pre></div></div>
-<div class="symboldecl">
-<div class="definition">
 <a class="symbolname" name="close-all-plots_func" href="#close-all-plots_func">close-all-plots</a>
 <span class="lambdalist"></span>
 <span class="symboltype">function</span></div>
