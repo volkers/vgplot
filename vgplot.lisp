@@ -383,7 +383,7 @@ styles can be following colors:
    \"k\" black
 
 e.g.:
-   (bar x y \"r;red values;\") bar plot y = f(x) with red boxes and label \"red values\"
+   (bar x y \"r;red values;\") draw a bar plot y = f(x) with red boxes and label \"red values\"
 "
     (if act-plot
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
