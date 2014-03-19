@@ -56,6 +56,19 @@
                             (coerce x 'vector)))
           vals))
 
+(defun vectorize-lists (vals)
+  "Coerce lists in vals to vectors"
+  (mapcar #'(lambda (x) (if (listp x)
+                            (coerce x 'vector)
+                            x))
+          vals))
+
+(defun vectorize-val-list (vals)
+  "Coerce :x and :y lists in vals to vectors
+vals has the form
+\(\(:x x :y y :label lbl :color clr) (:x x :y y :label lbl :color clr) ...)"
+  (mapcar #'vectorize-lists vals))
+
 (defun min-x-diff (x-l)
   "Return minimal difference between 2 consecutive elements in x.
 Throw an error if x is not increasing, i.e. difference not bigger than 0"
@@ -64,9 +77,10 @@ Throw an error if x is not increasing, i.e. difference not bigger than 0"
     min-diff))
 
 (defun extract-min-x-diff (l)
-  "l is a list in the form ((x y lbl-string) (x1 y1 lbl-string)...).
+  "l is a list in the form
+\((:x x :y y :label lbl :color clr) (:x x :y y :label lbl :color clr) ...).
 Return minimal difference of two consecutive x values"
-  (reduce #'min (map 'list #'min-x-diff (map 'list #'first l))))
+  (reduce #'min (map 'list #'min-x-diff (map 'list #'(lambda (l) (getf l :x #(0 1))) l))))
 
 (defun parse-vals (vals)
   "Parse input values to plot and return grouped list: ((x y lbl-string) (x1 y1 lbl-string)...)
@@ -363,50 +377,51 @@ e.g.:
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
-  (defun bar (&rest vals)
+  (defun bar (vals &key width)
     "Create a bar plot y = f(x) on active plot, create plot if needed.
-vals could be: y                  plot y over its index
-               y label-string     plot y over its index using label-string as label
-               x y                plot y = f(x)
-               x y label-string   plot y = f(x) using label-string as label
-               following parameters add curves to same plot e.g.:
-               x y label x1 y1 label1 ...
-label:
-A simple label in form of \"text\" is printed directly.
+vals is a list: '(&key :x :y :label :color) where
+                :x     vector or list of x values (optional, if absent plot to index)
+                :y     vector or list of y values
+                :label string for legend label (optional)
+                :color string defining the color (optional);
+                       must be known by gnuplot, e.g. red, green, blue, cyan or black
 
-A label with added style commands: label in form \"styles;text;\":
-styles can be following colors:
-   \"r\" red
-   \"g\" green
-   \"b\" blue
-   \"c\" cyan
-   \"k\" black
+vals could also be a list of these lists, drawing a grouped bar plot e.g.:
+                '((:x :y :label :color) (:x :y :label :color))
+
+:width (optional) width of the bar or the group of bars
 
 e.g.:
-   (bar x y \"r;red values;\") draw a bar plot y = f(x) with red boxes and label \"red values\"
-"
+   \(bar '(:x #(1 3 4) :y #(0.9 0.8 0.3) :label \"Values\" :color \"blue\")"
     (if act-plot
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
-    (let* ((val-l (parse-bar-vals (vectorize vals)))
+    (unless (listp (first vals))
+      ;; convert special case '(...) to '((...))
+      (setf vals (list vals)))
+    (let* ((val-l (vectorize-val-list vals))
            (plt-cmd)
-           (x-diff-min (extract-min-x-diff val-l))
-           (n-bars (length val-l))
-           (boxwidth (* 0.8 (/ x-diff-min n-bars)))
+           (n-bars (length vals))
+           (x-diff-min (extract-min-x-diff vals))
+           (boxwidth (or width
+                         (* 0.8 (/ x-diff-min n-bars))))
            (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
       (loop for pl in val-l do
+           ;; set some defaul values
+           (unless (getf pl :x)
+             (setf (getf pl :x) (range (length (getf pl :y)))))
+           (unless (getf pl :color)
+             (setf (getf pl :color) "red"))
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                            (map 'vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (first pl)) (second pl)))
+                        (map 'vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (getf pl :x)) (getf pl :y)))
                  (tmp-file-list act-plot))
            (incf bar-offset)
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
-                                      (destructuring-bind (&key style color title) (parse-label (third pl))
-                                        (declare (ignore style))
-                                        (format nil "\"~A\" with boxes linecolor rgb \"~A\" title \"~A\" "
-                                                (first (tmp-file-list act-plot)) color title)))))
+                                      (format nil "\"~A\" with boxes linecolor rgb \"~A\" title \"~A\" "
+                                                (first (tmp-file-list act-plot)) (getf pl :color) (getf pl :label "")))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "set boxwidth ~A absolute~%" boxwidth)
       (format (plot-stream act-plot) "set style fs solid~%")

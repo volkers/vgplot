@@ -156,6 +156,17 @@ the following is needed to change the keys back")
                         (first sampled) (second sampled) "sampled"))
          (title "Example of a mixture of continuous and discrete characteristics"))
        (close-plot)
+       (progn
+         (bar '(:y (7 9 7.6 8)))
+         (axis '(-1 4 -1 10))
+         (title "Simple example of a bar plot"))
+       (close-plot)
+       (progn
+         (bar '((:x #(2012 2013 2014) :y #(0.8 0.9 -0.3) :color "blue" :label "Values 1")
+                (:x #(2012 2013 2014) :y #(0.7 0.65 0.5) :color "red" :label "Values 2")
+                (:x #(2012 2013 2014) :y #(0.75 0.4 0.1) :color "cyan" :label "Values 3")))
+         (title "Another example of a bar plot"))
+       (close-plot)
        (or "The following works if you copy data.txt and data.csv
 from vgplot's source directory to your directory")
        (when (cl-fad:file-exists-p "data.txt")

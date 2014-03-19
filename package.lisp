@@ -33,6 +33,7 @@ mail: (remove #\\y (subseq \"avoidspamyvolykerysyar@gymyx.net\" 9))
 GNU General Public License
 ")
   (:export :axis
+           :bar
            :close-all-plots
            :close-plot
            :demo
