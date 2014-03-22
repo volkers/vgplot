@@ -50,16 +50,16 @@
   (princ (read-no-hang s)))
 
 (defun vectorize (vals)
-  "Coerce all sequences except strings to vectors"
+  "Coerce all sequences except strings to simple-vectors"
   (mapcar #'(lambda (x) (if (stringp x)
                             x
-                            (coerce x 'vector)))
+                            (coerce x 'simple-vector)))
           vals))
 
 (defun vectorize-lists (vals)
-  "Coerce lists in vals to vectors"
+  "Coerce lists in vals to simple-vectors"
   (mapcar #'(lambda (x) (if (listp x)
-                            (coerce x 'vector)
+                            (coerce x 'simple-vector)
                             x))
           vals))
 
@@ -72,7 +72,7 @@ vals has the form
 (defun min-x-diff (x-l)
   "Return minimal difference between 2 consecutive elements in x.
 Throw an error if x is not increasing, i.e. difference not bigger than 0"
-  (let ((min-diff (reduce #'min (map 'vector #'- (subseq x-l 1) x-l))))
+  (let ((min-diff (reduce #'min (map 'simple-vector #'- (subseq x-l 1) x-l))))
     (assert (< 0 min-diff) nil "X has to be increasing")
     min-diff))
 
@@ -258,12 +258,12 @@ If both arguments are given use yx as x and y is y.
 If you want to plot the stairplot directly, see function stairs."
   (cond
     ((not y)
-     (let* ((y (coerce yx 'vector))
+     (let* ((y (coerce yx 'simple-vector))
             (len (length y))
             (x (range len)))
        (stairs-no-plot x y)))
     ((or (not (simple-vector-p yx)) (not (simple-vector-p y)))
-     (stairs-no-plot (coerce yx 'vector) (coerce y 'vector)))
+     (stairs-no-plot (coerce yx 'simple-vector) (coerce y 'simple-vector)))
     (t (let*
            ((len (min (length yx) (length y)))
             (xx (make-array (1- (* 2 len))))
@@ -414,7 +414,7 @@ e.g.:
              (setf (getf pl :color) "red"))
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                        (map 'vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (getf pl :x)) (getf pl :y)))
+                        (map 'simple-vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (getf pl :x)) (getf pl :y)))
                  (tmp-file-list act-plot))
            (incf bar-offset)
            (setf plt-cmd (concatenate 'string (if plt-cmd
@@ -638,7 +638,7 @@ without limit-list do return current axis."
           (setf float-list (parse-floats line separator))
           (and (first float-list) ; ignore comment lines
                (mapcar #'vector-push-extend float-list val-list)))))
-    val-list))
+    (vectorize val-list)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; exported utilities
