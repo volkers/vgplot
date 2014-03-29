@@ -389,7 +389,7 @@ vals is a list: '(&key :x :y :label :color) where
 vals could also be a list of these lists, drawing a grouped bar plot e.g.:
                 '((:x :y :label :color) (:x :y :label :color))
 
-:width (optional) width of the bars
+:width (optional) width of the bars or the group of bars
 
 e.g.:
    \(bar '(:x #(1 3 4) :y #(0.9 0.8 0.3) :label \"Values\" :color \"blue\")"
@@ -401,10 +401,10 @@ e.g.:
       (setf vals (list vals)))
     (let* ((val-l (vectorize-val-list vals))
            (plt-cmd)
-           (n-bars (length vals))
+           (n-bars (coerce (length vals) 'float))
            (x-diff-min (extract-min-x-diff vals))
-           (boxwidth (or width
-                         (* 0.8 (/ x-diff-min n-bars))))
+           (boxwidth (/ (or width (* 0.8 x-diff-min))
+                        n-bars))
            (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
       (loop for pl in val-l do
            ;; set some defaul values

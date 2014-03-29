@@ -162,9 +162,10 @@ the following is needed to change the keys back")
          (title "Simple example of a bar plot"))
        (close-plot)
        (progn
-         (bar '((:x #(2012 2013 2014) :y #(0.8 0.9 -0.3) :color "blue" :label "Values 1")
-                (:x #(2012 2013 2014) :y #(0.7 0.65 0.5) :color "red" :label "Values 2")
-                (:x #(2012 2013 2014) :y #(0.75 0.4 0.1) :color "cyan" :label "Values 3")))
+         (bar '((:x #(2011 2013 2014) :y #(0.8 0.9 -0.3) :color "blue" :label "Values 1")
+                (:x #(2011 2013 2014) :y #(0.7 0.65 0.5) :color "red" :label "Values 2")
+                (:x #(2011 2013 2014) :y #(0.75 0.4 0.1) :color "cyan" :label "Values 3"))
+              :width 0.5)
          (title "Another example of a bar plot"))
        (close-plot)
        (or "The following works if you copy data.txt and data.csv
