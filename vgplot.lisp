@@ -296,6 +296,12 @@ If you want to plot the stairplot directly, see function stairs."
           (setf (svref xx (incf xi)) (svref yx i))
           (list xx yy)))))))
 
+(let ((default-colors (list "blue" "green" "red" "cyan")))
+  (setf (rest (last default-colors)) default-colors) ; make it circular for easier access
+  (defun get-default-color (idx)
+    "Return a default color as a string"
+    (nth idx default-colors)))
+
 (let ((plot-list nil)       ; List holding not active plots
       (act-plot nil))       ; actual plot
   (defun format-plot (print? text &rest args)
@@ -406,15 +412,13 @@ e.g.:
            (boxwidth (/ (or width (* 0.8 x-diff-min))
                         n-bars))
            (bar-offset (/ (- 1 n-bars) 2.0)) ; shift bars to group them
-           (default-colors (list "blue" "green" "red" "cyan"))
            (color-idx 0))
-      (setf (rest (last default-colors)) default-colors) ; make it circular for easier access
       (loop for pl in val-l do
            ;; set some defaul values
            (unless (getf pl :x)
              (setf (getf pl :x) (range (length (getf pl :y)))))
            (unless (getf pl :color)
-             (setf (getf pl :color) (nth color-idx default-colors)))
+             (setf (getf pl :color) (get-default-color color-idx)))
            (incf color-idx)
 
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
