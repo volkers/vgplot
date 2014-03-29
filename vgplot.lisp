@@ -405,13 +405,18 @@ e.g.:
            (x-diff-min (extract-min-x-diff vals))
            (boxwidth (/ (or width (* 0.8 x-diff-min))
                         n-bars))
-           (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
+           (bar-offset (/ (- 1 n-bars) 2.0)) ; shift bars to group them
+           (default-colors (list "blue" "green" "red" "cyan"))
+           (color-idx 0))
+      (setf (rest (last default-colors)) default-colors) ; make it circular for easier access
       (loop for pl in val-l do
            ;; set some defaul values
            (unless (getf pl :x)
              (setf (getf pl :x) (range (length (getf pl :y)))))
            (unless (getf pl :color)
-             (setf (getf pl :color) "red"))
+             (setf (getf pl :color) (nth color-idx default-colors)))
+           (incf color-idx)
+
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
                         (map 'simple-vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (getf pl :x)) (getf pl :y)))
