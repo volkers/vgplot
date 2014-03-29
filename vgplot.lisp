@@ -384,7 +384,7 @@ vals is a list: '(&key :x :y :label :color) where
                 :y     vector or list of y values
                 :label string for legend label (optional)
                 :color string defining the color (optional);
-                       must be known by gnuplot, e.g. red, green, blue, cyan or black
+                       must be known by gnuplot, e.g. blue, green, red or cyan
 
 vals could also be a list of these lists, drawing a grouped bar plot e.g.:
                 '((:x :y :label :color) (:x :y :label :color))
