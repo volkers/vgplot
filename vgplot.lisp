@@ -113,7 +113,7 @@ Create x if not existing."
 (defun parse-label (lbl)
   "Parse label string e.g. \"-k;label;\" and return key list (list :style style :color color :title title)."
   (let ((style "lines")
-        (color "red")
+        (color)
         (title "")
         (start-title (or (search ";" lbl) -1)) ;; -1 because subseq jumps over first ;
         (end-title (or (search ";" lbl :from-end t) (length lbl))))
@@ -364,7 +364,8 @@ e.g.:
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
     (let ((val-l (parse-vals (vectorize vals)))
-          (plt-cmd nil))
+          (plt-cmd)
+          (color-idx 0))
       (loop for pl in val-l do
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (if (null (second pl)) ;; special case plotting to index
@@ -377,7 +378,11 @@ e.g.:
                                                   "plot ")
                                       (destructuring-bind (&key style color title) (parse-label (third pl))
                                         (format nil "\"~A\" with ~A linecolor rgb \"~A\" title \"~A\" "
-                                              (first (tmp-file-list act-plot)) style color title)))))
+                                              (first (tmp-file-list act-plot))
+                                              style
+                                              (or color (get-default-color color-idx))
+                                              title))))
+           (incf color-idx))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
