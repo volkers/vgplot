@@ -296,11 +296,10 @@ If you want to plot the stairplot directly, see function stairs."
           (setf (svref xx (incf xi)) (svref yx i))
           (list xx yy)))))))
 
-(let ((default-colors (list "blue" "green" "red" "cyan")))
-  (setf (rest (last default-colors)) default-colors) ; make it circular for easier access
-  (defun get-default-color (idx)
-    "Return a default color as a string"
-    (nth idx default-colors)))
+(defun get-default-color (idx)
+  "Return a default color as a string"
+  (let ((default-colors (list "blue" "green" "red" "cyan")))
+    (nth (rem idx (length default-colors)) default-colors)))
 
 (let ((plot-list nil)       ; List holding not active plots
       (act-plot nil))       ; actual plot
