@@ -296,11 +296,6 @@ If you want to plot the stairplot directly, see function stairs."
           (setf (svref xx (incf xi)) (svref yx i))
           (list xx yy)))))))
 
-(defun get-default-color (idx)
-  "Return a default color as a string"
-  (let ((default-colors (list "blue" "green" "red" "cyan")))
-    (nth (rem idx (length default-colors)) default-colors)))
-
 (let ((plot-list nil)       ; List holding not active plots
       (act-plot nil))       ; actual plot
   (defun format-plot (print? text &rest args)
@@ -363,8 +358,7 @@ e.g.:
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
     (let ((val-l (parse-vals (vectorize vals)))
-          (plt-cmd)
-          (color-idx 0))
+          (plt-cmd))
       (loop for pl in val-l do
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (if (null (second pl)) ;; special case plotting to index
@@ -376,12 +370,13 @@ e.g.:
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
                                       (destructuring-bind (&key style color title) (parse-label (third pl))
-                                        (format nil "\"~A\" with ~A linecolor rgb \"~A\" title \"~A\" "
+                                        (format nil "\"~A\" with ~A ~A title \"~A\" "
                                               (first (tmp-file-list act-plot))
                                               style
-                                              (or color (get-default-color color-idx))
-                                              title))))
-           (incf color-idx))
+                                              (if color
+                                                  (format nil " linecolor rgb \"~A\"" color)
+                                                  "")
+                                              title)))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
@@ -410,20 +405,21 @@ e.g.:
       ;; convert special case '(...) to '((...))
       (setf vals (list vals)))
     (let* ((val-l (vectorize-val-list vals))
+           (clr-cmd)
            (plt-cmd)
            (n-bars (coerce (length vals) 'float))
            (x-diff-min (extract-min-x-diff vals))
            (boxwidth (/ (or width (* 0.8 x-diff-min))
                         n-bars))
-           (bar-offset (/ (- 1 n-bars) 2.0)) ; shift bars to group them
-           (color-idx 0))
+           (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
       (loop for pl in val-l do
-           ;; set some defaul values
+           ;; set default values
            (unless (getf pl :x)
              (setf (getf pl :x) (range (length (getf pl :y)))))
-           (unless (getf pl :color)
-             (setf (getf pl :color) (get-default-color color-idx)))
-           (incf color-idx)
+
+           (if (getf pl :color)
+               (setf clr-cmd (format nil " linecolor rgb \"~A\" " (getf pl :color)))
+               (setf clr-cmd ""))
 
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
@@ -433,8 +429,8 @@ e.g.:
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
-                                      (format nil "\"~A\" with boxes linecolor rgb \"~A\" title \"~A\" "
-                                                (first (tmp-file-list act-plot)) (getf pl :color) (getf pl :label "")))))
+                                      (format nil "\"~A\" with boxes ~A title \"~A\" "
+                                                (first (tmp-file-list act-plot)) clr-cmd (getf pl :label "")))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "set boxwidth ~A absolute~%" boxwidth)
       (format (plot-stream act-plot) "set style fs solid~%")
