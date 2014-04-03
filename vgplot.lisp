@@ -355,7 +355,8 @@ e.g.:
                                  label \"red values\"
 "
     (if act-plot
-        (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
+        (unless (multiplot-p act-plot)
+          (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
         (setf act-plot (make-plot)))
     (let ((val-l (parse-vals (vectorize vals)))
           (plt-cmd))
