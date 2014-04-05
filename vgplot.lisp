@@ -135,6 +135,12 @@ Create x if not existing."
              (#\k (setf color "black")))))
     (list :style style :color color :title title)))
 
+(defun get-color-cmd (color)
+  "Return color command string or empty string"
+  (if color
+      (format nil " linecolor rgb \"~A\"" color)
+      ""))
+
 (defun parse-floats (s sep)
   "Parse string s and return the found numbers separated by separator"
   (let ((c-list)
@@ -372,12 +378,7 @@ e.g.:
                                                   "plot ")
                                       (destructuring-bind (&key style color title) (parse-label (third pl))
                                         (format nil "\"~A\" with ~A ~A title \"~A\" "
-                                              (first (tmp-file-list act-plot))
-                                              style
-                                              (if color
-                                                  (format nil " linecolor rgb \"~A\"" color)
-                                                  "")
-                                              title)))))
+                                              (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
@@ -406,7 +407,6 @@ e.g.:
       ;; convert special case '(...) to '((...))
       (setf vals (list vals)))
     (let* ((val-l (vectorize-val-list vals))
-           (clr-cmd)
            (plt-cmd)
            (n-bars (coerce (length vals) 'float))
            (x-diff-min (extract-min-x-diff vals))
@@ -414,13 +414,9 @@ e.g.:
                         n-bars))
            (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
       (loop for pl in val-l do
-           ;; set default values
+           ;; create x-vector when plotting to index
            (unless (getf pl :x)
              (setf (getf pl :x) (range (length (getf pl :y)))))
-
-           (if (getf pl :color)
-               (setf clr-cmd (format nil " linecolor rgb \"~A\" " (getf pl :color)))
-               (setf clr-cmd ""))
 
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
@@ -431,7 +427,7 @@ e.g.:
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
                                       (format nil "\"~A\" with boxes ~A title \"~A\" "
-                                                (first (tmp-file-list act-plot)) clr-cmd (getf pl :label "")))))
+                                              (first (tmp-file-list act-plot)) (get-color-cmd (getf pl :color)) (getf pl :label "")))))
       (format (plot-stream act-plot) "set grid~%")
       (format (plot-stream act-plot) "set boxwidth ~A absolute~%" boxwidth)
       (format (plot-stream act-plot) "set style fs solid~%")
