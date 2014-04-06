@@ -112,7 +112,7 @@ vals is a list: '(&key :x :y :label :color) where
                 :y     vector or list of y values
                 :label string for legend label (optional)
                 :color string defining the color (optional);
-                       must be known by gnuplot, e.g. red, green, blue, cyan or black
+                       must be known by gnuplot, e.g. blue, green, red or cyan
 
 vals could also be a list of these lists, drawing a grouped bar plot e.g.:
                 '((:x :y :label :color) (:x :y :label :color))
@@ -281,9 +281,9 @@ filled and then the next row is filled.
 For example, a plot with 2 rows by 3 cols will have following plot indices:
 
           +-----+-----+-----+
-          |  1  |  2  |  3  |
+          |  0  |  1  |  2  |
           +-----+-----+-----+
-          |  4  |  5  |  6  |
+          |  3  |  4  |  5  |
           +-----+-----+-----+
 
 Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.

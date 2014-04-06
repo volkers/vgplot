@@ -444,15 +444,15 @@ filled and then the next row is filled.
 For example, a plot with 2 rows by 3 cols will have following plot indices:
 
           +-----+-----+-----+
-          |  1  |  2  |  3  |
+          |  0  |  1  |  2  |
           +-----+-----+-----+
-          |  4  |  5  |  6  |
+          |  3  |  4  |  5  |
           +-----+-----+-----+
 
 Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 "
-    (when (or (< index 1)
-              (> index (* rows cols)))
+    (when (or (< index 0)
+              (>= index (* rows cols)))
       (progn
         (format t "Index out of bound~%")
         (return-from subplot nil)))
@@ -460,8 +460,8 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
           (y-size (coerce (/ 1 rows) 'float))
           (x-orig)
           (y-orig))
-      (setf x-orig (* x-size (mod (- index 1) cols)))
-      (setf y-orig (- 1 (* y-size (+ 1 (floor (/ (- index 1) cols))))))
+      (setf x-orig (* x-size (mod index cols)))
+      (setf y-orig (- 1 (* y-size (+ 1 (floor (/ index cols))))))
       ;;
       (unless act-plot
         (setf act-plot (make-plot)))
