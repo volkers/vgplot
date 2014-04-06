@@ -436,8 +436,7 @@ e.g.:
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
   (defun subplot (rows cols index)
-    "(Experimental command, not all features work correctly yet.)
-Set up a plot grid with rows by cols subwindows and use location index for next plot command.
+    "Set up a plot grid with rows by cols subwindows and use location index for next plot command.
 The plot index runs row-wise.  First all the columns in a row are
 filled and then the next row is filled.
 
