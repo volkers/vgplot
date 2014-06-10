@@ -9,16 +9,16 @@
 This common lisp library is an interface to the gnuplot plotting
 utility.
 
-The intention of the API is to be similar to some of the plot commands
+The intention of the API is to resemble to some of the plot commands
 of octave or matlab.
 
 ## Usage
 
-(asdf:load-system :vgplot)
+(asdf:load-system :vgplot) or (ql:quickload :vgplot)
 
 (vgplot:plot '(1 2 3) '(0 -2 17))
 
-For examples run the demo function in vgplot.lisp:
+For examples run the demo function:
 
 (vgplot:demo)
 
