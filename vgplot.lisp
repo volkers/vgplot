@@ -20,7 +20,8 @@
 
 (in-package #:vgplot)
 
-(defvar *debug* nil)
+(defvar *debug* nil
+  "Actvate debugging when true.")
 
 (defclass plots ()
   ((plot-stream :initform (open-plot) :accessor plot-stream)
