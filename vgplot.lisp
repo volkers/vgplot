@@ -161,11 +161,9 @@ Create x if not existing."
 
 (defun del-tmp-files (tmp-file-list)
   "Delete files in tmp-file-list and return nil"
-  (when tmp-file-list
-    (loop for name in tmp-file-list do
-         (when (probe-file name)
-           (delete-file name))))
-  nil)
+  (loop for name in tmp-file-list do
+       (when (probe-file name)
+         (delete-file name))))
 
 (defun make-del-tmp-file-function (tmp-file-list)
   "Return a function that removes the files in tmp-file-list."
