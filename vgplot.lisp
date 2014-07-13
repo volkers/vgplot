@@ -159,18 +159,17 @@ Create x if not existing."
     (push (read-from-string (nreverse (coerce c-list 'string)) nil) r-list)
     (nreverse r-list)))
 
-(defun del-tmp-files (tmp-file-list)
-  "Delete files in tmp-file-list and return nil"
-  (loop for name in tmp-file-list do
-       (when (probe-file name)
-         (delete-file name))))
-
 (defun make-del-tmp-file-function (tmp-file-list)
   "Return a function that removes the files in tmp-file-list."
   #'(lambda ()
       (loop for name in tmp-file-list do
            (when (probe-file name)
              (delete-file name)))))
+
+(defun del-tmp-files (tmp-file-list)
+  "Delete files in tmp-file-list and return nil"
+  (funcall (make-del-tmp-file-function tmp-file-list))
+  nil) ; not really needed but makes it clear
 
 (defun add-del-tmp-files-to-exit-hook (tmp-file-list)
   "If possible, add delete of tmp files to exit hooks.
