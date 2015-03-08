@@ -397,7 +397,7 @@ vals could also be a list of these lists, drawing a grouped bar plot e.g.:
 :width (optional) width of the bars or the group of bars
 
 e.g.:
-   \(bar '(:x #(1 3 4) :y #(0.9 0.8 0.3) :label \"Values\" :color \"blue\")"
+   \(bar '(:x #(1 3 4) :y #(0.9 0.8 0.3) :label \"Values\" :color \"blue\"))"
     (if act-plot
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
