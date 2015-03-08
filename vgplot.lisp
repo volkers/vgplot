@@ -185,7 +185,7 @@ c   separator character
 nil comment line \(or empty line)"
   (let ((data-found nil)) ; to handle comment-only lines
     (loop for c across s do
-         (cond 
+         (cond
            ((digit-char-p c) (setf data-found t))
            ((eql c #\#) (loop-finish))
            ;; ignore following characters
@@ -617,7 +617,7 @@ without limit-list do return current axis."
           (parse-axis (format-plot *debug* "show yrange"))))
 
 (defun load-data-file (fname)
-  "Return a list of found vectors (one vector for one column) in data file fname 
+  "Return a list of found vectors (one vector for one column) in data file fname
 \(e.g. csv-file)"
   (let ((c-num)
         (separator)
