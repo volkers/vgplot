@@ -88,23 +88,6 @@ vals has the form
                             (coerce x 'list)))
           l))
 
-(defun combine-col (l)
-  "Build a list combining corresponding elements in previded sublists
-e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
--> \((1 A X) (2 B Y) (3 C Z))"
-  (let ((first-part (loop for x in l collect (first x)))
-        (rest-part (loop for x in l collect (rest x))))
-    (if (some #'null rest-part)
-        (list first-part)
-        (cons first-part (combine-col rest-part)))))
-
-(defun extract-y-val (l)
-  "Extracts the y values from the supplied y list and splices the result, e.g.
-\(extract-y-val '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\")
-                  (#(0.7 0.8 0.9) :label \"Values\" :color \"blue\")))
--> ((0.9 0.7) (0.8 0.8) (0.3 0.9))"
-  (combine-col (listelize-list (mapcar #'first l))))
-
 (defun min-x-diff (x-l)
   "Return minimal difference between 2 consecutive elements in x.
 Throw an error if x is not increasing, i.e. difference not bigger than 0"
@@ -436,13 +419,29 @@ e.g.:
 e.g.:
    \(bar-x :x #(\"Item 1\" \"Item 2\" \"Item 3\") :y '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\"))
              :style \"stacked\")"
+    (labels
+        ((combine-col (l)
+           "Build a list combining corresponding elements in previded sublists
+e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
+-> \((1 A X) (2 B Y) (3 C Z))"
+           (let ((first-part (loop for x in l collect (first x)))
+                 (rest-part (loop for x in l collect (rest x))))
+             (if (some #'null rest-part)
+                 (list first-part)
+                 (cons first-part (combine-col rest-part)))))
+         (extract-y-val (l)
+           "Extracts the y values from the supplied y list and splices the result, e.g.
+\(extract-y-val '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\")
+                  (#(0.7 0.8 0.9) :label \"Values\" :color \"blue\")))
+-> ((0.9 0.7) (0.8 0.8) (0.3 0.9))"
+           (combine-col (listelize-list (mapcar #'first l))))))
     (if act-plot
         (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
         (setf act-plot (make-plot)))
     (assert (every #'stringp x) nil "x values have to be strings")
     (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
             (map nil #'(lambda (a b)
-                         (format tmp-file-stream "~A ~A~%" a (v-format " ~,,,,,,'eE" b)))
+                         (format tmp-file-stream "\"~A\" ~A~%" a (v-format " ~,,,,,,'eE" b)))
                  x (extract-y-val y)))
           (tmp-file-list act-plot)))
   (defun bar (vals &key width)
