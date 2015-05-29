@@ -20,6 +20,15 @@
 
 (in-package #:vgplot)
 
+;; debug-macro:
+(defmacro dbg (l)
+  (let ((quoted-l (gensym))
+        (unquoted-l (gensym)))
+    `(let ((,quoted-l ',l)
+           (,unquoted-l ,l))
+       (format t "dbg: ~a -> ~a~%" ,quoted-l ,unquoted-l)
+       ,unquoted-l)))
+
 (defvar *debug* nil
   "Actvate debugging when true.")
 
@@ -69,6 +78,32 @@
 vals has the form
 \(\(:x x :y y :label lbl :color clr) (:x x :y y :label lbl :color clr) ...)"
   (mapcar #'vectorize-lists vals))
+
+(defun listelize-list (l)
+  "Coerce sequences in l except strings to lists:
+\(listelize-list '(#(1 2 3) #(a b c)))
+-> \((1 2 3) (A B C))"
+  (mapcar #'(lambda (x) (if (stringp x)
+                            x
+                            (coerce x 'list)))
+          l))
+
+(defun combine-col (l)
+  "Build a list combining corresponding elements in previded sublists
+e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
+-> \((1 A X) (2 B Y) (3 C Z))"
+  (let ((first-part (loop for x in l collect (first x)))
+        (rest-part (loop for x in l collect (rest x))))
+    (if (some #'null rest-part)
+        (list first-part)
+        (cons first-part (combine-col rest-part)))))
+
+(defun extract-y-val (l)
+  "Extracts the y values from the supplied y list and splices the result, e.g.
+\(extract-y-val '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\")
+                  (#(0.7 0.8 0.9) :label \"Values\" :color \"blue\")))
+-> ((0.9 0.7) (0.8 0.8) (0.3 0.9))"
+  (combine-col (listelize-list (mapcar #'first l))))
 
 (defun min-x-diff (x-l)
   "Return minimal difference between 2 consecutive elements in x.
@@ -158,6 +193,12 @@ Create x if not existing."
     ;; add also number after the last sep:
     (push (read-from-string (nreverse (coerce c-list 'string)) nil) r-list)
     (nreverse r-list)))
+
+(defun v-format (format-string v)
+  "Convert members of sequence v to strings using format-string and
+concatenates the result."
+  (reduce #'(lambda (s-1 s-2) (concatenate 'string s-1 s-2))
+          (map 'simple-vector  #'(lambda (x) (format nil format-string x)) v)))
 
 (defun make-del-tmp-file-function (tmp-file-list)
   "Return a function that removes the files in tmp-file-list."
@@ -382,6 +423,28 @@ e.g.:
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
+  (defun bar-x (&key x y style width)
+    "Create a bar plot y = f(x) on active plot, create plot if needed.
+                :x     vector or list of x strings (optional, if absent plot to index)
+                :y     list of y '((y &key :label :color) (y &key :label :color) ...)
+                       y      vector or list of y values
+                       :label string for legend label (optional)
+                       :color string defining the color (optional);
+                              must be known by gnuplot, e.g. blue, green, red or cyan
+                :style (optional) \"grouped\" (default) or \"stacked\"
+                :width (optional) width of the bars or the group of bars
+e.g.:
+   \(bar-x :x #(\"Item 1\" \"Item 2\" \"Item 3\") :y '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\"))
+             :style \"stacked\")"
+    (if act-plot
+        (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
+        (setf act-plot (make-plot)))
+    (assert (every #'stringp x) nil "x values have to be strings")
+    (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+            (map nil #'(lambda (a b)
+                         (format tmp-file-stream "~A ~A~%" a (v-format " ~,,,,,,'eE" b)))
+                 x (extract-y-val y)))
+          (tmp-file-list act-plot)))
   (defun bar (vals &key width)
     "Create a bar plot y = f(x) on active plot, create plot if needed.
 vals is a list: '(&key :x :y :label :color) where

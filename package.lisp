@@ -35,6 +35,7 @@ GNU General Public License
   (:export :*debug*
            :axis
            :bar
+           :bar-x
            :close-all-plots
            :close-plot
            :demo
