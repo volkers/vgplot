@@ -406,7 +406,7 @@ e.g.:
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
-  (defun bar-x (&key x y (style "grouped") width)
+  (defun bar-x (&key x y (style "grouped") (width 0.8))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
                 :x     vector or list of x strings (optional, if absent plot to index)
                 :y     list of y '((y &key :label :color) (y &key :label :color) ...)
@@ -418,7 +418,7 @@ e.g.:
                 :width (optional) width of the bars or the group of bars
 e.g.:
    \(bar-x :x #(\"Item 1\" \"Item 2\" \"Item 3\") :y '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\"))
-             :style \"stacked\")"
+             :style \"stacked\" :width 0.6)"
     (labels
         ((combine-col (l)
            "Build a list combining corresponding elements in previded sublists
@@ -451,6 +451,8 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
               (tmp-file-list act-plot))
         (setf plt-file (first (tmp-file-list act-plot)))
         (format-plot t "set style fill solid 1.00 border lt -1")
+        (format-plot t "set grid~%")
+        (format-plot t "set boxwidth ~A absolute~%" width)
         (format-plot t style-cmd)
         (format-plot t "set style data histograms")
         ;; gnuplot command shall be e.g.:

@@ -66,7 +66,7 @@ ENTER continue, all other characters break and quit demo"
         :y '((#(0.9 0.8 0.3) :color "blue")(#(0.6 0.7 0.1) :label "Values 2" :color "green")))
        (bar-x :x #("Item 1" "Item 2" "Item 3")
         :y '((#(90 80 25) :label "Values 1" :color "blue")(#(10 20 75) :label "Values 2" :color "green"))
-        :style "stacked")
+        :style "stacked" :width 0.6)
        (plot '(0 -2 17))
        (text 0.2 10 "You can plot a list directly against its index\\n(text x y) adds a string")
        (progn
