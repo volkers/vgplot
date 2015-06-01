@@ -406,7 +406,7 @@ e.g.:
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
-  (defun bar-x (&key x y style width)
+  (defun bar-x (&key x y (style "grouped") width)
     "Create a bar plot y = f(x) on active plot, create plot if needed.
                 :x     vector or list of x strings (optional, if absent plot to index)
                 :y     list of y '((y &key :label :color) (y &key :label :color) ...)
@@ -434,16 +434,34 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
 \(extract-y-val '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\")
                   (#(0.7 0.8 0.9) :label \"Values\" :color \"blue\")))
 -> ((0.9 0.7) (0.8 0.8) (0.3 0.9))"
-           (combine-col (listelize-list (mapcar #'first l))))))
-    (if act-plot
-        (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
-        (setf act-plot (make-plot)))
-    (assert (every #'stringp x) nil "x values have to be strings")
-    (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
-            (map nil #'(lambda (a b)
-                         (format tmp-file-stream "\"~A\" ~A~%" a (v-format " ~,,,,,,'eE" b)))
-                 x (extract-y-val y)))
-          (tmp-file-list act-plot)))
+           (combine-col (listelize-list (mapcar #'first l)))))
+      (let ((style-cmd (cond ((equal style "grouped") "set style histogram clustered")
+                             ((equal style "stacked") "set style histogram rowstacked")
+                             (t (error "Unknown style \"~A\"!" style))))
+            (n-bars (length y)))
+        (if act-plot
+            (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
+            (setf act-plot (make-plot)))
+        (assert (every #'stringp x) nil "x values have to be strings")
+        (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+                (map nil #'(lambda (a b)
+                             (format tmp-file-stream "\"~A\" ~A~%" a (v-format " ~,,,,,,'eE" b)))
+                     x (extract-y-val y)))
+              (tmp-file-list act-plot))
+        (format-plot t "set style fill solid 1.00 border lt -1")
+        (format-plot t style-cmd)
+        (format-plot t "set style data histograms")
+        ;; e.g.: plot 'data.txt' using 2:xtic(1) title 'label1', 'data.txt' using 3:xtic(1) title 'label2'
+        (format-plot t
+                     (reduce #'(lambda (s1 s2) (concatenate 'string s1 s2))
+                             (loop for i from 1 to n-bars
+                                collect (if (eql i 1)
+                                            (format nil "plot \'~A\' using ~A:xtic(1) title \'~A\'"
+                                                    (first (tmp-file-list act-plot)) (1+ i) (getf (rest (nth (1- i) y)) :label ""))
+                                            (format nil ", \'~A\' using ~A:xtic(1) title \'~A\'"
+                                                    (first (tmp-file-list act-plot)) (1+ i) (getf (rest (nth (1- i) y)) :label ""))))))
+        (axis '(t t 0 t))
+      )))
   (defun bar (vals &key width)
     "Create a bar plot y = f(x) on active plot, create plot if needed.
 vals is a list: '(&key :x :y :label :color) where
