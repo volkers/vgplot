@@ -60,6 +60,10 @@ ENTER continue, all other characters break and quit demo"
      '( ;; add demo commands here
        (bar-x :x #("January 2015" "Mars 2015" "June 2015")
         :y '((#(0.9 0.8 0.3) :label "Values 1" :color "blue")(#(0.6 0.7 0.1) :label "Values 2" :color "green")))
+       (bar-x :x #("January 2015" "Mars 2015" "June 2015")
+        :y '((#(0.9 0.8 0.3) :label "Values 1")(#(0.6 0.7 0.1) :label "Values 2" :color "green")))
+       (bar-x :x #("January 2015" "Mars 2015" "June 2015")
+        :y '((#(0.9 0.8 0.3) :color "blue")(#(0.6 0.7 0.1) :label "Values 2" :color "green")))
        (bar-x :x #("Item 1" "Item 2" "Item 3")
         :y '((#(90 80 25) :label "Values 1" :color "blue")(#(10 20 75) :label "Values 2" :color "green"))
         :style "stacked")

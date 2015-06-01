@@ -438,6 +438,7 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
       (let ((style-cmd (cond ((equal style "grouped") "set style histogram clustered")
                              ((equal style "stacked") "set style histogram rowstacked")
                              (t (error "Unknown style \"~A\"!" style))))
+            (plt-file)
             (n-bars (length y)))
         (if act-plot
             (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
@@ -448,18 +449,25 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
                              (format tmp-file-stream "\"~A\" ~A~%" a (v-format " ~,,,,,,'eE" b)))
                      x (extract-y-val y)))
               (tmp-file-list act-plot))
+        (setf plt-file (first (tmp-file-list act-plot)))
         (format-plot t "set style fill solid 1.00 border lt -1")
         (format-plot t style-cmd)
         (format-plot t "set style data histograms")
         ;; e.g.: plot 'data.txt' using 2:xtic(1) title 'label1', 'data.txt' using 3:xtic(1) title 'label2'
         (format-plot t
                      (reduce #'(lambda (s1 s2) (concatenate 'string s1 s2))
-                             (loop for i from 1 to n-bars
-                                collect (if (eql i 1)
-                                            (format nil "plot \'~A\' using ~A:xtic(1) title \'~A\'"
-                                                    (first (tmp-file-list act-plot)) (1+ i) (getf (rest (nth (1- i) y)) :label ""))
-                                            (format nil ", \'~A\' using ~A:xtic(1) title \'~A\'"
-                                                    (first (tmp-file-list act-plot)) (1+ i) (getf (rest (nth (1- i) y)) :label ""))))))
+                             (loop
+                                for col-num from 2 to (1+ n-bars) ;; columns start at 2 in the command
+                                for l-num from 0 to (1- n-bars) ;; but the lists starts at 0
+                                collect
+                                ;; y is e.g. '((#(1 3 2) :label "Lbl1" :color "blue") (#(2 1 3) :label "Lbl2" :color "green"))
+                                  (let* ((color-cmd (get-color-cmd (getf (rest (nth l-num y)) :color)))
+                                         (label (getf (rest (nth l-num y)) :label "")))
+                                    (if (eql l-num 0)
+                                        (format nil "plot \'~A\' using ~A:xtic(1) ~A title \'~A\'"
+                                                plt-file col-num color-cmd label)
+                                        (format nil ", \'~A\' using ~A:xtic(1) ~A title \'~A\'"
+                                                plt-file col-num color-cmd label))))))
         (axis '(t t 0 t))
       )))
   (defun bar (vals &key width)
