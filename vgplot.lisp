@@ -453,7 +453,8 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
         (format-plot t "set style fill solid 1.00 border lt -1")
         (format-plot t style-cmd)
         (format-plot t "set style data histograms")
-        ;; e.g.: plot 'data.txt' using 2:xtic(1) title 'label1', 'data.txt' using 3:xtic(1) title 'label2'
+        ;; gnuplot command shall be e.g.:
+        ;; plot 'data.txt' using 2:xtic(1) linecolor rgb 'blue' title 'label1', 'data.txt' using 3:xtic(1) linecolor rgb 'green' title 'label2'
         (format-plot t
                      (reduce #'(lambda (s1 s2) (concatenate 'string s1 s2))
                              (loop
@@ -463,13 +464,14 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
                                 ;; y is e.g. '((#(1 3 2) :label "Lbl1" :color "blue") (#(2 1 3) :label "Lbl2" :color "green"))
                                   (let* ((color-cmd (get-color-cmd (getf (rest (nth l-num y)) :color)))
                                          (label (getf (rest (nth l-num y)) :label "")))
-                                    (if (eql l-num 0)
-                                        (format nil "plot \'~A\' using ~A:xtic(1) ~A title \'~A\'"
-                                                plt-file col-num color-cmd label)
-                                        (format nil ", \'~A\' using ~A:xtic(1) ~A title \'~A\'"
-                                                plt-file col-num color-cmd label))))))
+                                    (format nil (if (eql l-num 0)
+                                                    "plot \'~A\' using ~A:xtic(1) ~A title \'~A\'"
+                                                    ", \'~A\' using ~A:xtic(1) ~A title \'~A\'")
+                                            plt-file col-num color-cmd label)))))
         (axis '(t t 0 t))
-      )))
+        (force-output (plot-stream act-plot))
+        (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot))
+        (read-n-print-no-hang (plot-stream act-plot)))))
   (defun bar (vals &key width)
     "Create a bar plot y = f(x) on active plot, create plot if needed.
 vals is a list: '(&key :x :y :label :color) where
