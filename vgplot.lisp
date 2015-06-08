@@ -406,9 +406,9 @@ e.g.:
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
-  (defun bar-x (&key x y (style "grouped") (width 0.8))
+  (defun bar (&key x y (style "grouped") (width 0.8))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
-                :x     vector or list of x strings (optional, if absent plot to index)
+                :x     vector or list of x strings
                 :y     list of y '((y &key :label :color) (y &key :label :color) ...)
                        y      vector or list of y values
                        :label string for legend label (optional)
@@ -417,8 +417,9 @@ e.g.:
                 :style (optional) \"grouped\" (default) or \"stacked\"
                 :width (optional) width of the bars or the group of bars
 e.g.:
-   \(bar-x :x #(\"Item 1\" \"Item 2\" \"Item 3\") :y '((#(0.9 0.8 0.3) :label \"Values\" :color \"blue\"))
-             :style \"stacked\" :width 0.6)"
+   \(bar :x #(\"Item 1\" \"Item 2\" \"Item 3\") :y '((#(0.3 0.2 0.1) :label \"Values\" :color \"blue\")
+                                              (#(0.1 0.2 0.3) :label \"Values\" :color \"red\"))
+        :style \"stacked\" :width 0.6)"
     (labels
         ((combine-col (l)
            "Build a list combining corresponding elements in previded sublists
@@ -474,57 +475,6 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
         (force-output (plot-stream act-plot))
         (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot))
         (read-n-print-no-hang (plot-stream act-plot)))))
-  (defun bar (vals &key width)
-    "Create a bar plot y = f(x) on active plot, create plot if needed.
-vals is a list: '(&key :x :y :label :color) where
-                :x     vector or list of x values (optional, if absent plot to index)
-                :y     vector or list of y values
-                :label string for legend label (optional)
-                :color string defining the color (optional);
-                       must be known by gnuplot, e.g. blue, green, red or cyan
-
-vals could also be a list of these lists, drawing a grouped bar plot e.g.:
-                '((:x :y :label :color) (:x :y :label :color))
-
-:width (optional) width of the bars or the group of bars
-
-e.g.:
-   \(bar '(:x #(1 3 4) :y #(0.9 0.8 0.3) :label \"Values\" :color \"blue\"))"
-    (if act-plot
-        (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
-        (setf act-plot (make-plot)))
-    (unless (listp (first vals))
-      ;; convert special case '(...) to '((...))
-      (setf vals (list vals)))
-    (let* ((val-l (vectorize-val-list vals))
-           (plt-cmd)
-           (n-bars (coerce (length vals) 'float))
-           (x-diff-min (extract-min-x-diff vals))
-           (boxwidth (/ (or width (* 0.8 x-diff-min))
-                        n-bars))
-           (bar-offset (/ (- 1 n-bars) 2.0))) ; shift bars to group them
-      (loop for pl in val-l do
-           ;; create x-vector when plotting to index
-           (unless (getf pl :x)
-             (setf (getf pl :x) (range (length (getf pl :y)))))
-
-           (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
-                   (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                        (map 'simple-vector #'(lambda (x) (+ x (* boxwidth bar-offset))) (getf pl :x)) (getf pl :y)))
-                 (tmp-file-list act-plot))
-           (incf bar-offset)
-           (setf plt-cmd (concatenate 'string (if plt-cmd
-                                                  (concatenate 'string plt-cmd ", ")
-                                                  "plot ")
-                                      (format nil "\"~A\" with boxes ~A title \"~A\" "
-                                              (first (tmp-file-list act-plot)) (get-color-cmd (getf pl :color)) (getf pl :label "")))))
-      (format (plot-stream act-plot) "set grid~%")
-      (format (plot-stream act-plot) "set boxwidth ~A absolute~%" boxwidth)
-      (format (plot-stream act-plot) "set style fs solid~%")
-      (format (plot-stream act-plot) "~A~%" plt-cmd)
-      (force-output (plot-stream act-plot))
-      (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
-    (read-n-print-no-hang (plot-stream act-plot)))
   (defun subplot (rows cols index)
     "Set up a plot grid with rows by cols subwindows and use location index for next plot command.
 The plot index runs row-wise.  First all the columns in a row are

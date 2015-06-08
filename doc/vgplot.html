@@ -114,24 +114,22 @@ without limit-list do return current axis.</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="bar_func" href="#bar_func">bar</a>
-<span class="lambdalist">vals &key width</span>
+<span class="lambdalist">&key x y (style grouped) (width 0.8)</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Create a bar plot y = f(x) on active plot, create plot if needed.
-vals is a list: '(&key :x :y :label :color) where
-                :x     vector or list of x values (optional, if absent plot to index)
-                :y     vector or list of y values
-                :label string for legend label (optional)
-                :color string defining the color (optional);
-                       must be known by gnuplot, e.g. blue, green, red or cyan
-
-vals could also be a list of these lists, drawing a grouped bar plot e.g.:
-                '((:x :y :label :color) (:x :y :label :color))
-
-:width (optional) width of the bars or the group of bars
-
+                :x     vector or list of x strings
+                :y     list of y '((y &key :label :color) (y &key :label :color) ...)
+                       y      vector or list of y values
+                       :label string for legend label (optional)
+                       :color string defining the color (optional);
+                              must be known by gnuplot, e.g. blue, green, red or cyan
+                :style (optional) "grouped" (default) or "stacked"
+                :width (optional) width of the bars or the group of bars
 e.g.:
-   (bar '(:x #(1 3 4) :y #(0.9 0.8 0.3) :label "Values" :color "blue")</pre></div></div>
+   (bar :x #("Item 1" "Item 2" "Item 3") :y '((#(0.3 0.2 0.1) :label "Values" :color "blue")
+                                              (#(0.1 0.2 0.3) :label "Values" :color "red"))
+        :style "stacked" :width 0.6)</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="close-all-plots_func" href="#close-all-plots_func">close-all-plots</a>
@@ -182,7 +180,7 @@ If key parameter replot is true (default) run an additional replot thereafter.</
 <span class="lambdalist">fname</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
-<pre>Return a list of found vectors (one vector for one column) in data file fname 
+<pre>Return a list of found vectors (one vector for one column) in data file fname
 (e.g. csv-file)</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
