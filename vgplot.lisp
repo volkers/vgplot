@@ -417,9 +417,11 @@ e.g.:
                 :style (optional) \"grouped\" (default) or \"stacked\"
                 :width (optional) width of the bars or the group of bars
 e.g.:
-   \(bar :x #(\"Item 1\" \"Item 2\" \"Item 3\") :y '((#(0.3 0.2 0.1) :label \"Values\" :color \"blue\")
-                                              (#(0.1 0.2 0.3) :label \"Values\" :color \"red\"))
-        :style \"stacked\" :width 0.6)"
+   \(bar :x #(\"Item 1\" \"Item 2\" \"Item 3\")
+        :y '((#(0.3 0.2 0.1) :label \"Values\" :color \"blue\")
+             (#(0.1 0.2 0.3) :label \"Values\" :color \"red\"))
+        :style \"stacked\"
+        :width 0.6)"
     (labels
         ((combine-col (l)
            "Build a list combining corresponding elements in previded sublists
