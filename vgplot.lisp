@@ -399,7 +399,7 @@ e.g.:
     (read-n-print-no-hang (plot-stream act-plot)))
   (defun bar (&key x y (style "grouped") (width 0.8))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
-                :x     vector or list of x strings
+                :x     vector or list of x strings or numbers
                 :y     list of y '((y &key :label :color) (y &key :label :color) ...)
                        y      vector or list of y values
                        :label string for legend label (optional)
@@ -437,7 +437,6 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
         (if act-plot
             (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot)))
             (setf act-plot (make-plot)))
-        (assert (every #'stringp x) nil "x values have to be strings")
         (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                 (map nil #'(lambda (a b)
                              (format tmp-file-stream "\"~A\" ~A~%" a (v-format " ~,,,,,,'eE" b)))
