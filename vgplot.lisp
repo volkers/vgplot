@@ -407,7 +407,8 @@ e.g.:
                        :color string defining the color (optional);
                               must be known by gnuplot, e.g. blue, green, red or cyan
                 :style (optional) \"grouped\" (default) or \"stacked\"
-                :width (optional) width of the bars or the group of bars
+                :width (optional) width of the bars or the group of bars where 1.0 means
+                       to fill the space completely (space between 2 groups is always 2 boxes wide)
 e.g.:
    \(bar :x #(\"Item 1\" \"Item 2\" \"Item 3\")
         :y '((#(0.3 0.2 0.1) :label \"Values\" :color \"blue\")
