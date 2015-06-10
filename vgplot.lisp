@@ -20,15 +20,6 @@
 
 (in-package #:vgplot)
 
-;; debug-macro:
-(defmacro dbg (l)
-  (let ((quoted-l (gensym))
-        (unquoted-l (gensym)))
-    `(let ((,quoted-l ',l)
-           (,unquoted-l ,l))
-       (format t "dbg: ~a -> ~a~%" ,quoted-l ,unquoted-l)
-       ,unquoted-l)))
-
 (defvar *debug* nil
   "Actvate debugging when true.")
 
