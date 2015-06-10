@@ -449,8 +449,8 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
               (tmp-file-list act-plot))
         (setf plt-file (first (tmp-file-list act-plot)))
         (format-plot t "set style fill solid 1.00 border lt -1")
-        (format-plot t "set grid~%")
-        (format-plot t "set boxwidth ~A absolute~%" width)
+        (format-plot t "set grid")
+        (format-plot t "set boxwidth ~A absolute" width)
         (format-plot t style-cmd)
         (format-plot t "set style data histograms")
         ;; gnuplot command shall be e.g.:
@@ -545,7 +545,7 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 
 (defun replot ()
   "Send the replot command to gnuplot, i.e. apply all recent changes in the plot."
-  (format-plot *debug* "clear~%") ;; maybe only for multiplot needed?
+  (format-plot *debug* "clear") ;; maybe only for multiplot needed?
   (format-plot *debug* "replot"))
 
 (defun grid (style &key (replot t))
