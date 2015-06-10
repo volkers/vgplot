@@ -3,7 +3,7 @@
 #|
     This file contains a demonstration of some of the functions of vgplot.
     vgplot is an interface to the gnuplot utility.
-    Copyright (C) 2013, 2014  Volker Sarodnick
+    Copyright (C) 2013 - 2015  Volker Sarodnick
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -155,13 +155,18 @@ the following is needed to change the keys back")
          (title "Example of a mixture of continuous and discrete characteristics"))
        (close-plot)
        (progn
-         (bar :x #("January 2015" "Mars 2015" "June 2015")
+         (bar :y '(((0.9 0.8 0.3))
+                   ((0.6 0.7 0.1))))
+         (title "Very simple example of a bar plot"))
+       (close-plot)
+       (progn
+         (bar :x #(2011 2013 2014)
               :y '((#(0.9 0.8 0.3) :label "Values 1")
                    (#(0.6 0.7 0.1) :label "Values 2")))
          (title "Simple example of a bar plot"))
        (close-plot)
        (progn
-         (bar :x #("2011" "2013" "2014")
+         (bar :x #("January 2015" "Mars 2015" "June 2015")
               :y '((#(0.8 0.9 -0.3) :color "blue" :label "Values 1")
                    (#(0.7 0.65 0.5) :color "red" :label "Values 2")
                    (#(0.75 0.4 0.1) :color "cyan" :label "Values 3")
@@ -170,6 +175,7 @@ the following is needed to change the keys back")
          (axis '(t t -0.5 1))
          (xlabel "Year of the event")
          (ylabel "Result")
+         (grid nil)
          (title "Another example of a bar plot"))
        (close-plot)
        (progn
@@ -178,7 +184,8 @@ the following is needed to change the keys back")
                    (#(0.7 0.65 0.5) :color "red" :label "Values 2")
                    (#(0.75 0.4 0.1) :color "cyan" :label "Values 3")
                    (#(0.6 0.5 0.2) :color "green" :label "Values 4"))
-              :width 0.5 :style "stacked")
+              :width 0.5
+              :style "stacked")
          (axis '(t t 0 3))
          (xlabel "Student")
          (ylabel "Result")

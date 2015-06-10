@@ -2,7 +2,7 @@
 
 #|
     This is the test environment for vgplot, an interface to the gnuplot utility.
-    Copyright (C) 2013, 2014  Volker Sarodnick
+    Copyright (C) 2013 - 2015  Volker Sarodnick
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
