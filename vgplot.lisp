@@ -397,7 +397,7 @@ e.g.:
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
-  (defun bar (&key x y (style "grouped") (width 0.8))
+  (defun bar (&key x y (style "grouped") (width 0.8) (gap 2.0))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
                 :x     (optional) vector or list of x strings or numbers
                        plot to index if not provided
@@ -407,8 +407,10 @@ e.g.:
                        :color string defining the color (optional);
                               must be known by gnuplot, e.g. blue, green, red or cyan
                 :style (optional) \"grouped\" (default) or \"stacked\"
-                :width (optional) width of the bars or the group of bars where 1.0 means
-                       to fill the space completely (space between 2 groups is always 2 boxes wide)
+                :width (optional) width of the bars where 1.0 means to fill the space completely
+                       (for the gap in style \"grouped\" see parameter gap)
+                :gap   (optional, only used in style \"grouped\") the gap between the groups
+                       in units of width of one boxwidth; defaults to 2.0
 e.g.:
    \(bar :x #(\"Item 1\" \"Item 2\" \"Item 3\")
         :y '((#(0.3 0.2 0.1) :label \"Values\" :color \"blue\")
@@ -431,7 +433,7 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
                   (#(0.7 0.8 0.9) :label \"Values\" :color \"blue\")))
 -> ((0.9 0.7) (0.8 0.8) (0.3 0.9))"
            (combine-col (listelize-list (mapcar #'first l)))))
-      (let ((style-cmd (cond ((equal style "grouped") "set style histogram clustered")
+      (let ((style-cmd (cond ((equal style "grouped") (format nil "set style histogram clustered gap ~A" gap))
                              ((equal style "stacked") "set style histogram rowstacked")
                              (t (error "Unknown style \"~A\"!" style))))
             (plt-file)
