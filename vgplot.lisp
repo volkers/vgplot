@@ -410,7 +410,7 @@ e.g.:
                 :width (optional) width of the bars where 1.0 means to fill the space completely
                        (for the gap in style \"grouped\" see parameter gap)
                 :gap   (optional, only used in style \"grouped\") the gap between the groups
-                       in units of width of one boxwidth; defaults to 2.0
+                       in units of width of one boxwidth
 e.g.:
    \(bar :x #(\"Item 1\" \"Item 2\" \"Item 3\")
         :y '((#(0.3 0.2 0.1) :label \"Values\" :color \"blue\")
