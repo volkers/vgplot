@@ -559,6 +559,49 @@ If key parameter replot is true (default) run an additional replot thereafter."
   (when replot
     (replot)))
 
+(defun legend (&rest options)
+  "Provide options to the legend aka keys.
+     :show       Show legend (default)
+     :hide       Hide legend
+     :boxon      Use box around the legend
+     :boxoff     Don't use a box (default)
+     :left       Title left of sample line (default)
+     :right      Title right of sample line
+     :north      Place legend center top
+     :south      Center bottom
+     :east       Right center
+     :west       Left center
+     :northeast  Right top (default)
+     :northwest  Left top
+     :southeast  Right bottom
+     :southwest  Left bottom
+     :inside     Place legend inside the plot (default)
+     :outside    Place legend outside the plot"
+  (let* ((opt-tbl '(:show " on"
+                    :hide " off"
+                    :boxon " box"
+                    :boxoff " nobox"
+                    :left " noreverse"
+                    :right "  reverse"
+                    :north " center top"
+                    :south " center bottom"
+                    :east " right center"
+                    :west " left center"
+                    :northeast " right top"
+                    :northwest " left top"
+                    :southeast " right bottom"
+                    :southwest " left bottom"
+                    :inside " inside"
+                    :outside " outside")))
+    (labels ((parse-opts (opts)
+               (cond
+                 ((null opts) "")
+                 (t (concatenate 'string
+                                 (or (getf opt-tbl (first opts))
+                                     (error "Unrecognized option ~A" (first opts)))
+                                 (parse-opts (rest opts)))))))
+      (format-plot t "set key ~A" (parse-opts options))
+      (replot))))
 (defun title (str &key (replot t))
   "Add title str to plot. If key parameter replot is true (default)
 run an additional replot thereafter."

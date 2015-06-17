@@ -41,6 +41,7 @@ GNU General Public License
            :figure
            :format-plot
            :grid
+           :legend
            :load-data-file
            :new-plot
            :plot

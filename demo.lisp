@@ -107,6 +107,9 @@ the following is needed to change the keys back")
          (plot x y "b;y = sin(x);" x z "g;y = cos(x);")
          (title "Some Other Graphs"))
        (progn
+         (legend :outside :boxon :southeast :right)
+         (title "Use legend to manipulate the legend (aka keys)"))
+       (progn
          (new-plot)
          (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
          (plot x y "+k;y = cos(2x) (new-plot);")
@@ -151,7 +154,8 @@ the following is needed to change the keys back")
                 (yd (map 'vector #'e-fun xd))
                 (sampled (stairs-no-plot xd yd)))
            (plot x y "b;continuous;"
-                        (first sampled) (second sampled) "sampled"))
+                 (first sampled) (second sampled) "sampled"))
+         (legend :southeast)
          (title "Example of a mixture of continuous and discrete characteristics"))
        (close-plot)
        (progn
