@@ -110,6 +110,9 @@ the following is needed to change the keys back")
          (legend :outside :boxon :southeast :right)
          (title "Use legend to manipulate the legend (aka keys)"))
        (progn
+         (legend :at 5 0.4)
+         (title "Place the legend directly at position x y"))
+       (progn
          (new-plot)
          (setf y (map 'vector #'(lambda (a) (sin (* 2 a))) x))
          (plot x y "+k;y = cos(2x) (new-plot);")

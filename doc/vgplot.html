@@ -90,7 +90,7 @@ GNU General Public License
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="*debug*_vars" href="#*debug*_vars">*debug*</a>: 
-<span class="value">T</span>
+<span class="value">NIL</span>
 <span class="symboltype">variable</span></div>
 <div class="documentation">
 <pre>Actvate debugging when true.</pre></div></div></div></div>
@@ -189,10 +189,10 @@ If key parameter replot is true (default) run an additional replot thereafter.</
 <pre>Provide options to the legend aka keys.
      :show       Show legend (default)
      :hide       Hide legend
-     :boxon      Use box around the legend (default)
-     :boxoff     Don't use a box
-     :left       title left of sample line (default)
-     :right      title right of sample line
+     :boxon      Use box around the legend
+     :boxoff     Don't use a box (default)
+     :left       Title left of sample line (default)
+     :right      Title right of sample line
      :north      Place legend center top
      :south      Center bottom
      :east       Right center
@@ -201,6 +201,7 @@ If key parameter replot is true (default) run an additional replot thereafter.</
      :northwest  Left top
      :southeast  Right bottom
      :southwest  Left bottom
+     :at x y     Place legend at position x,y
      :inside     Place legend inside the plot (default)
      :outside    Place legend outside the plot</pre></div></div>
 <div class="symboldecl">

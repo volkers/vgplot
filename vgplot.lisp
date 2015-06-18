@@ -575,6 +575,7 @@ If key parameter replot is true (default) run an additional replot thereafter."
      :northwest  Left top
      :southeast  Right bottom
      :southwest  Left bottom
+     :at x y     Place legend at position x,y
      :inside     Place legend inside the plot (default)
      :outside    Place legend outside the plot"
   (let* ((opt-tbl '(:show " on"
@@ -596,6 +597,15 @@ If key parameter replot is true (default) run an additional replot thereafter."
     (labels ((parse-opts (opts)
                (cond
                  ((null opts) "")
+                 ;; handle special case ":at x y"
+                 ((eq :at (first opts))
+                  (let ((x (second opts))
+                        (y (third opts)))
+                    (assert (and (numberp x) (numberp y)) nil
+                            "Coordinates x=~A y=~A after :at have to be numbers!" x y)
+                    (concatenate 'string (format nil " at ~A,~A" x y)
+                                 (parse-opts (rest (rest (rest opts)))))))
+                 ;; handle standard cases
                  (t (concatenate 'string
                                  (or (getf opt-tbl (first opts))
                                      (error "Unrecognized option ~A" (first opts)))
