@@ -43,11 +43,14 @@ GNU General Public License
            :grid
            :legend
            :load-data-file
+           :loglog
            :new-plot
            :plot
            :plot-file
            :replot
            :range
+           :semilogx
+           :semilogy
            :stairs
            :stairs-no-plot
            :subplot

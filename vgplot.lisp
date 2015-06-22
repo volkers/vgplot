@@ -265,7 +265,8 @@ function stairs-no-plot."
                     (push x p-list)
                     (push y p-list)
                     (construct-plist p-list (rest (rest pars))))))))
-      (apply #'plot (construct-plist par-list (vectorize vals))))))
+      (format-plot nil "set nologscale") ; ensure that there is no log scaling from plotting before active
+      (apply #'do-plot (construct-plist par-list (vectorize vals))))))
 
 (defun stairs-no-plot (yx &optional y)
   "Prepare a stairstep plot, but don't actually plot it.
@@ -346,7 +347,33 @@ print also response to stdout if print? is true"
     (when act-plot
       (push act-plot plot-list)
       (setf act-plot (make-plot))))
-  (defun plot (&rest vals)
+  (defun do-plot (&rest vals)
+    "Do the actual plot. For documentation see doc string of the macro plot"
+    (if act-plot
+        (unless (multiplot-p act-plot)
+          (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
+        (setf act-plot (make-plot)))
+    (let ((val-l (parse-vals (vectorize vals)))
+          (plt-cmd))
+      (loop for pl in val-l do
+           (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+                   (if (null (second pl)) ;; special case plotting to index
+                       (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
+                       (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
+                            (first pl) (second pl))))
+                 (tmp-file-list act-plot))
+           (setf plt-cmd (concatenate 'string (if plt-cmd
+                                                  (concatenate 'string plt-cmd ", ")
+                                                  "plot ")
+                                      (destructuring-bind (&key style color title) (parse-label (third pl))
+                                        (format nil "\"~A\" with ~A ~A title \"~A\" "
+                                              (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
+      (format (plot-stream act-plot) "set grid~%")
+      (format (plot-stream act-plot) "~A~%" plt-cmd)
+      (force-output (plot-stream act-plot))
+      (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
+    (read-n-print-no-hang (plot-stream act-plot)))
+  (defmacro plot (&rest vals)
     "Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
                y label-string     plot y over its index using label-string as label
@@ -373,30 +400,23 @@ e.g.:
    (plot x y \"r+;red values;\") plots y = f(x) as red points with the
                                  label \"red values\"
 "
-    (if act-plot
-        (unless (multiplot-p act-plot)
-          (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
-        (setf act-plot (make-plot)))
-    (let ((val-l (parse-vals (vectorize vals)))
-          (plt-cmd))
-      (loop for pl in val-l do
-           (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
-                   (if (null (second pl)) ;; special case plotting to index
-                       (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
-                       (map nil #'(lambda (a b) (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE~%" a b))
-                            (first pl) (second pl))))
-                 (tmp-file-list act-plot))
-           (setf plt-cmd (concatenate 'string (if plt-cmd
-                                                  (concatenate 'string plt-cmd ", ")
-                                                  "plot ")
-                                      (destructuring-bind (&key style color title) (parse-label (third pl))
-                                        (format nil "\"~A\" with ~A ~A title \"~A\" "
-                                              (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
-      (format (plot-stream act-plot) "set grid~%")
-      (format (plot-stream act-plot) "~A~%" plt-cmd)
-      (force-output (plot-stream act-plot))
-      (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
-    (read-n-print-no-hang (plot-stream act-plot)))
+    (format-plot nil "set nologscale")
+    `(do-plot ,@vals))
+  (defmacro semilogx (&rest vals)
+    "Produce a two-dimensional plot using a logarithmic scale for the X axis.
+See the documentation of the plot command for a description of the arguments."
+    (format-plot nil "set logscale x")
+    `(do-plot ,@vals))
+  (defmacro semilogy (&rest vals)
+    "Produce a two-dimensional plot using a logarithmic scale for the Y axis.
+See the documentation of the plot command for a description of the arguments."
+    (format-plot nil "set logscale y")
+    `(do-plot ,@vals))
+  (defmacro loglog (&rest vals)
+    "Produce a two-dimensional plot using logarithmic scales scale for both axis.
+See the documentation of the plot command for a description of the arguments."
+    (format-plot nil "set logscale xy")
+    `(do-plot ,@vals))
   (defun bar (&key x y (style "grouped") (width 0.8) (gap 2.0))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
                 :x     (optional) vector or list of x strings or numbers
