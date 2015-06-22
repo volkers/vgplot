@@ -406,10 +406,12 @@ e.g.:
     "Produce a two-dimensional plot using a logarithmic scale for the X axis.
 See the documentation of the plot command for a description of the arguments."
     (format-plot nil "set logscale x")
+    (format-plot nil "set nologscale y")
     `(do-plot ,@vals))
   (defmacro semilogy (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the Y axis.
 See the documentation of the plot command for a description of the arguments."
+    (format-plot nil "set nologscale x")
     (format-plot nil "set logscale y")
     `(do-plot ,@vals))
   (defmacro loglog (&rest vals)
