@@ -373,7 +373,7 @@ print also response to stdout if print? is true"
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
-  (defmacro plot (&rest vals)
+  (defun plot (&rest vals)
     "Plot y = f(x) on active plot, create plot if needed.
 vals could be: y                  plot y over its index
                y label-string     plot y over its index using label-string as label
@@ -401,24 +401,24 @@ e.g.:
                                  label \"red values\"
 "
     (format-plot nil "set nologscale")
-    `(do-plot ,@vals))
-  (defmacro semilogx (&rest vals)
+    (multiple-value-call #'do-plot (values-list vals)))
+  (defun semilogx (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the X axis.
 See the documentation of the plot command for a description of the arguments."
     (format-plot nil "set logscale x")
     (format-plot nil "set nologscale y")
-    `(do-plot ,@vals))
-  (defmacro semilogy (&rest vals)
+    (multiple-value-call #'do-plot (values-list vals)))
+  (defun semilogy (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the Y axis.
 See the documentation of the plot command for a description of the arguments."
     (format-plot nil "set nologscale x")
     (format-plot nil "set logscale y")
-    `(do-plot ,@vals))
-  (defmacro loglog (&rest vals)
+    (multiple-value-call #'do-plot (values-list vals)))
+  (defun loglog (&rest vals)
     "Produce a two-dimensional plot using logarithmic scales scale for both axis.
 See the documentation of the plot command for a description of the arguments."
     (format-plot nil "set logscale xy")
-    `(do-plot ,@vals))
+    (multiple-value-call #'do-plot (values-list vals)))
   (defun bar (&key x y (style "grouped") (width 0.8) (gap 2.0))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
                 :x     (optional) vector or list of x strings or numbers
