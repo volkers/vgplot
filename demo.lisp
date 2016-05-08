@@ -99,6 +99,9 @@ the following is needed to change the keys back")
        (progn
          (text 0.5 -0.5 "Remove the grid" :tag 1)
          (grid nil))
+       (progn
+         (text 0.5 -0.5 "print-plot prints the plot into a file" :tag 1)
+         (print-plot #p"plot.pdf"))
        (and "close-plot closes the actual plot"
         (close-plot))
        (progn

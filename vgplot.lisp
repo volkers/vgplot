@@ -402,6 +402,28 @@ e.g.:
 "
     (format-plot nil "set nologscale")
     (multiple-value-call #'do-plot (values-list vals)))
+  (defun print-plot (filename)
+    "Print the actual plot into filename (a pathname).
+Use the extension of filename to guess the terminal type.
+Currently supported terminals: gif, pdf, png
+
+Example: (vgplot:print-plot #p\"plot.pdf\")"
+    (assert (pathnamep filename))
+    (let* ((filename-string (namestring filename))
+           (extension (cl-ppcre:scan-to-strings "\\w+$" filename-string))
+           (old-terminal (first (cl-ppcre:all-matches-as-strings
+                                 "(?<=terminal type is ).*"
+                                 (format-plot nil "show terminal"))))
+           (terminals '(("gif" . "gif")
+                        ("pdf" . "pdf")
+                        ("png" . "png"))))
+      (vgplot:format-plot t "set terminal ~A" (cdr (assoc extension terminals :test #'string=)))
+      (vgplot:format-plot t "set output \"~A\"" filename-string)
+      (vgplot:format-plot t "refresh")
+      (vgplot:format-plot t "unset output")
+      ;; and back to original terminal:
+      (vgplot:format-plot t "set terminal ~A" old-terminal)))
+
   (defun semilogx (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the X axis.
 See the documentation of the plot command for a description of the arguments."

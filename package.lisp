@@ -47,6 +47,7 @@ GNU General Public License
            :new-plot
            :plot
            :plot-file
+           :print-plot
            :replot
            :range
            :semilogx

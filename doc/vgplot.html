@@ -269,6 +269,17 @@ e.g.:
 (other separators may work), use with-lines style</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
+<a class="symbolname" name="print-plot_func" href="#print-plot_func">print-plot</a>
+<span class="lambdalist">filename</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Print the actual plot into filename (a pathname).
+Use the extension of filename to guess the terminal type.
+Currently supported terminals: gif, pdf, png
+
+Example: (vgplot:print-plot #p"plot.pdf")</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
 <a class="symbolname" name="range_func" href="#range_func">range</a>
 <span class="lambdalist">a &optional b (step 1)</span>
 <span class="symboltype">function</span></div>
