@@ -270,14 +270,20 @@ e.g.:
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="print-plot_func" href="#print-plot_func">print-plot</a>
-<span class="lambdalist">filename</span>
+<span class="lambdalist">filename &key terminal</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Print the actual plot into filename (a pathname).
-Use the extension of filename to guess the terminal type.
-Currently supported terminals: gif, pdf, png
+Use the (optional) terminal or if not provided,
+use the extension of filename to guess the terminal type.
+Guessing of terminals works currently for: gif, pdf, png
 
-Example: (vgplot:print-plot #p"plot.pdf")</pre></div></div>
+Examples: (vgplot:print-plot #p"plot.pdf")
+          (vgplot:print-plot #p"plot.eps" :terminal "epscairo")
+
+It is possible to give additional parameters inside the terminal parameter, e.g.:
+(vgplot:print-plot #p"plot.pdf" :terminal "pdfcairo size \"5cm\",\"5cm\"")
+</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="range_func" href="#range_func">range</a>
