@@ -402,12 +402,18 @@ e.g.:
 "
     (format-plot nil "set nologscale")
     (multiple-value-call #'do-plot (values-list vals)))
-  (defun print-plot (filename)
+  (defun print-plot (filename &key terminal)
     "Print the actual plot into filename (a pathname).
-Use the extension of filename to guess the terminal type.
-Currently supported terminals: gif, pdf, png
+Use the (optional) terminal or if not provided,
+use the extension of filename to guess the terminal type.
+Guessing of terminals works currently for: gif, pdf, png
 
-Example: (vgplot:print-plot #p\"plot.pdf\")"
+Examples: (vgplot:print-plot #p\"plot.pdf\")
+          (vgplot:print-plot #p\"plot.eps\" :terminal \"epscairo\")
+
+It is possible to give additional parameters inside the terminal parameter, e.g.:
+(vgplot:print-plot #p\"plot.pdf\" :terminal \"pdfcairo size \\\"5cm\\\",\\\"5cm\\\"\")
+"
     (assert (pathnamep filename))
     (let* ((filename-string (namestring filename))
            (extension (cl-ppcre:scan-to-strings "\\w+$" filename-string))
@@ -417,7 +423,10 @@ Example: (vgplot:print-plot #p\"plot.pdf\")"
            (terminals '(("gif" . "gif")
                         ("pdf" . "pdf")
                         ("png" . "png"))))
-      (vgplot:format-plot t "set terminal ~A" (cdr (assoc extension terminals :test #'string=)))
+      (vgplot:format-plot t "set terminal ~A"
+                          (or terminal
+                              (cdr (assoc extension terminals :test #'string=))
+                              (error "Provide a terminal to print to (no terminal given and guessing failed)!")))
       (vgplot:format-plot t "set output \"~A\"" filename-string)
       (vgplot:format-plot t "refresh")
       (vgplot:format-plot t "unset output")
