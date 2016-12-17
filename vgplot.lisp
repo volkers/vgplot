@@ -23,6 +23,9 @@
 (defvar *debug* nil
   "Actvate debugging when true.")
 
+(defvar *gnuplot-binary* "gnuplot"
+  "Gnuplot binary. Change when gnuplot not in path.")
+
 (defclass plots ()
   ((plot-stream :initform (open-plot) :accessor plot-stream)
    (multiplot-p :initform nil :accessor multiplot-p)
@@ -34,7 +37,7 @@
 
 (defun open-plot ()
   "Start gnuplot process and return stream to gnuplot"
-  (do-execute "gnuplot" nil))
+  (do-execute *gnuplot-binary* nil))
 
 (defun read-no-hang (s)
   "Read from stream and return string (non blocking)"
