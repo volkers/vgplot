@@ -768,7 +768,9 @@ without limit-list do return current axis."
 
 (defun load-data-file (fname)
   "Return a list of found vectors (one vector for one column) in data file fname
-\(e.g. csv-file)"
+\(e.g. a csv-file).
+datafile fname must hold columns separated by spaces, tabs or commas \(other separators may work),
+content after # till end of line is assumed to be a comment and ignored."
   (let ((c-num)
         (separator)
         (val-list))
