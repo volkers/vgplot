@@ -3,7 +3,7 @@
 #|
     This file contains a demonstration of some of the functions of vgplot.
     vgplot is an interface to the gnuplot utility.
-    Copyright (C) 2013 - 2015  Volker Sarodnick
+    Copyright (C) 2013 - 2018  Volker Sarodnick
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by

@@ -26,7 +26,7 @@ and see API documentation in doc/vgplot.html or here: http://goto.glocalnet.net/
 
 ## License
 
-Copyright (C) 2013 - 2015 Volker Sarodnick
+Copyright (C) 2013 - 2018 Volker Sarodnick
 
 mail: (remove #\\y (subseq \"avoidspamyvolykerysyar@gymyx.net\" 9))
 

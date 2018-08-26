@@ -7,5 +7,5 @@ open tasks:
 
 - avoid the (ltk-) warnings when loading the lib; should I implement
   do-execute by myself?
-
-- meaningfull error message when running make-doc without cl-api
+  (warnings only when loading directly by asdf, no warning when
+  loading through ql:quickload)
