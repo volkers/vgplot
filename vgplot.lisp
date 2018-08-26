@@ -786,13 +786,19 @@ content after # till end of line is assumed to be a comment and ignored."
       (push (make-array 100 :element-type 'number :adjustable t :fill-pointer 0) val-list))
 
     (with-open-file (in fname :direction :input)
-      (let ((float-list))
+      (let ((float-list)
+            (line-num 0))
         (do ((line (read-line in nil 'eof)
                    (read-line in nil 'eof)))
             ((eql line 'eof))
+          (incf line-num)
           (setf float-list (parse-floats line separator))
-          (and (first float-list) ; ignore comment lines
-               (mapcar #'vector-push-extend float-list val-list)))))
+          (setf float-list (remove-if-not 'numberp float-list))
+          (cond
+            ((null (first float-list))) ; ignore comment lines
+            ((/= c-num (length float-list))
+             (error "Number of columns wrong in ~a on line ~a!" fname line-num))
+            (t (mapcar #'vector-push-extend float-list val-list))))))
     (vectorize val-list)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
