@@ -221,6 +221,16 @@ nil comment line \(or empty line)"
         t ; there was data before EOL or comment but no other separator
         nil))) ; comment-only line
 
+(defun get-cmd-string (data-file &optional x-in-file)
+  (if x-in-file
+      (format nil "plot \"~A\" using 1:($2) with lines" data-file)
+      (format nil "plot \"~A\" using ($1) with lines" data-file)))
+
+(defun get-next-cmd-string (data-file i &optional x-in-file)
+  (if x-in-file
+      (format nil ", \"~A\" using 1:($~A) with lines" data-file i)
+      (format nil ", \"~A\" using ($~A) with lines" data-file i)))
+
 (defun count-data-columns (s &optional (separator))
   "Count data columns in strings like \"1 2 3 # comment\", seperators
 could be a variable number of spaces, tabs or the optional separator"
@@ -569,12 +579,13 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
       (read-n-print-no-hang (plot-stream act-plot))
       (force-output (plot-stream act-plot))
       (read-n-print-no-hang (plot-stream act-plot))))
-  (defun plot-file (data-file)
+  (defun plot-file (data-file &optional x-in-file)
     "Plot data-file directly, datafile must hold columns separated by spaces, tabs or commas
 \(other separators may work), use with-lines style"
     (let ((c-num)
           (separator)
-          (cmd-string (format nil "plot \"~A\" using ($1) with lines" data-file)))
+          (cmd-string (get-cmd-string data-file x-in-file))
+          (second-y (if x-in-file 3 1)))
       (with-open-file (in data-file :direction :input)
         (setf separator (do ((c (get-separator (read-line in))
                                 (get-separator (read-line in))))
@@ -583,9 +594,9 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
         (setf c-num (do ((num (count-data-columns (read-line in) separator)
                               (count-data-columns (read-line in) separator)))
                         ((> num 0) num))))
-      (loop for i from 2 to c-num do
+      (loop for i from second-y to c-num do
          (setf cmd-string (concatenate 'string cmd-string
-                                       (format nil ", \"~A\" using ($~A) with lines" data-file i))))
+                                       (get-next-cmd-string data-file i x-in-file))))
       (unless act-plot
         (setf act-plot (make-plot)))
       (format (plot-stream act-plot) "set grid~%")
