@@ -830,8 +830,7 @@ content after # till end of line is assumed to be a comment and ignored."
      ;; dependency to cl-api not defined in asd-file because I don't want getting
      ;; this dependency (make-doc is internal and should only be used by developer)
      ;; ignore that :api-gen is probably not loaded in standard case
-     (setq apigen (find-symbol "API-GEN" 'cl-api))
-     (setq found t))
+     (setq apigen (find-symbol "API-GEN" 'cl-api)))
     (if apigen
         (with-open-file (stream "README" :direction :output :if-exists :supersede)
           (write-string (documentation (find-package :vgplot) 't) stream)
