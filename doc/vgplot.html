@@ -271,11 +271,13 @@ e.g.:
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="plot-file_func" href="#plot-file_func">plot-file</a>
-<span class="lambdalist">data-file</span>
+<span class="lambdalist">data-file &key (x-col)</span>
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Plot data-file directly, datafile must hold columns separated by spaces, tabs or commas
-(other separators may work), use with-lines style</pre></div></div>
+(other separators may work), use with-lines style.
+                :x-col     (optional) column to use as x values.
+                           plot to index if not provided</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="print-plot_func" href="#print-plot_func">print-plot</a>
