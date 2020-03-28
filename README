@@ -16,11 +16,11 @@ For examples run the demo function:
 
 (vgplot:demo)
 
-and see API documentation in doc/vgplot.html or here: http://goto.glocalnet.net/volkers/vgplot/vgplot.html
+and see API documentation in doc/vgplot.html or on http://quickdocs.org/vgplot
 
 ## License
 
-Copyright (C) 2013 - 2018 Volker Sarodnick
+Copyright (C) 2013 - 2020 Volker Sarodnick
 
 mail: (remove #\y (subseq "avoidspamyvolykerysyar@gymyx.net" 9))
 
