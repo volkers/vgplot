@@ -140,16 +140,17 @@ Create x if not existing."
     (setf title (subseq lbl (1+ start-title) end-title))
     (when (> start-title 0)
       (loop for c across (subseq lbl 0 start-title) do
-           (ecase c
-             (#\- (setf style "lines"))
-             (#\. (setf style "dots"))
-             (#\+ (setf style "points"))
-             (#\o (setf style "circles"))
-             (#\r (setf color "red"))
-             (#\g (setf color "green"))
-             (#\b (setf color "blue"))
-             (#\c (setf color "cyan"))
-             (#\k (setf color "black")))))
+        (ecase c
+          (#\- (setf style "lines"))
+          (#\: (setf style "lines dt \". . \""))
+          (#\. (setf style "dots"))
+          (#\+ (setf style "points"))
+          (#\o (setf style "circles"))
+          (#\r (setf color "red"))
+          (#\g (setf color "green"))
+          (#\b (setf color "blue"))
+          (#\c (setf color "cyan"))
+          (#\k (setf color "black")))))
     (list :style style :color color :title title)))
 
 (defun get-color-cmd (color)
@@ -394,6 +395,7 @@ A simple label in form of \"text\" is printed directly.
 A label with added style commands: label in form \"styles;text;\":
 styles can be (combinations possible):
    \"-\" lines
+   \":\" dotted lines
    \".\" dots
    \"+\" points
    \"o\" circles

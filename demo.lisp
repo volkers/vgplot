@@ -122,8 +122,8 @@ the following is needed to change the keys back")
          (text 0.5 -0.5 "new-plot adds a new plot window"))
        (text-show-label)
        (progn
-         (plot x y "og;y = cos(2x) (new-plot);")
-         (text 0.5 0.5 "Different line style" :tag 1))
+         (plot x y "og;y = cos(2x) (new-plot);" #(0 1 2 4 7) #(-1 2 1 -1.2 0) ":r;dotted style;")
+         (text 0.5 0.5 "Different line styles" :tag 1))
        (progn
          (and "(format-plot) allows direct commands to the running gnuplot process")
          (format-plot t "set size square 0.5,0.5~%")
