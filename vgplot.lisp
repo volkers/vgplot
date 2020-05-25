@@ -113,7 +113,7 @@ For efficiency reasons return ((y nil lbl-string)(...)) if only y given"
     (t nil)))
 
 (defun parse-vals-3d (vals)
-  "Analogous to parse-vals, but for 3d plots.  
+  "Analogous to parse-vals, but for 3d plots.
 Parse input values to 3d-plot and return grouped list:  ((x y z lbl-string) (x1 y1 z1 lbl-string) ...)
    "
   (cond
@@ -424,7 +424,7 @@ e.g.:
     (format-plot nil "set nologscale")
     (multiple-value-call #'do-plot (values-list vals)))
   (defun 3d-plot (&rest vals)
-    "Do a 3d plot.  Uses gnuplot's 'splot'.  
+    "Do a 3d plot.  Uses gnuplot's 'splot'.
      The inputs are similar to 'plot', but with some key differences:
 vals could be: x y z
                x y z label-string
@@ -437,7 +437,7 @@ style commands in the label-string work the same as in 'plot'."
     (let ((val-l (parse-vals-3d (vectorize vals)))
           (plt-cmd))
       (loop for pl in val-l do
-           ;(format t "~a~%" val-l)
+         ;; (format t "~a~%" val-l)
            (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
                    (if (null (second pl)) ;; special case plotting to index
                        (map nil #'(lambda (a) (format tmp-file-stream "~,,,,,,'eE~%" a)) (first pl))
@@ -449,14 +449,13 @@ style commands in the label-string work the same as in 'plot'."
                                                   "splot ")
                                       (destructuring-bind (&key style color title) (parse-label (fourth pl))
                                         (format nil "\"~A\" with ~A ~A title \"~A\" "
-                                              (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
+                                                (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
       (format (plot-stream act-plot) "set grid~%")
-      ;(format t "~A~%" plt-cmd)
+      ;; (format t "~A~%" plt-cmd)
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
-    (read-n-print-no-hang (plot-stream act-plot))
-    )
+    (read-n-print-no-hang (plot-stream act-plot)))
   (defun print-plot (filename &key terminal)
     "Print the actual plot into filename (a pathname).
 Use the (optional) terminal or if not provided,

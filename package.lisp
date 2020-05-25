@@ -61,4 +61,5 @@ GNU General Public License
            :text-show-label
            :title
            :xlabel
-           :ylabel))
+           :ylabel
+           :3d-plot))
