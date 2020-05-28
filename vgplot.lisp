@@ -19,7 +19,7 @@
 
     Main author: Volker Sarodnick
 
-    Contributions: Lewis Grozinger
+    Contributions: Lewis Grozinger, Alexander Radcliffe
 |#
 
 (in-package #:vgplot)
