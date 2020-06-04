@@ -164,6 +164,7 @@ the following is needed to change the keys back")
               (y (map 'vector #'cos z)))
          (3d-plot x y z)
          (title "Example of an 3D plot"))
+       (close-plot)
        (progn
          (setf y #(0 4 6.5 6.8 6.5 6.2 6.1 6.05 6.0 6.0))
          (stairs y)
