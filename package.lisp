@@ -22,7 +22,7 @@ For examples run the demo function:
 
 (vgplot:demo)
 
-and see API documentation in doc/vgplot.html or here: http://goto.glocalnet.net/volkers/vgplot/vgplot.html
+and see API documentation: http://quickdocs.org/vgplot/api
 
 ## License
 
