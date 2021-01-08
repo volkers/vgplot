@@ -16,7 +16,7 @@ For examples run the demo function:
 
 (vgplot:demo)
 
-and see API documentation: http://quickdocs.org/vgplot/api
+and see API documentation in doc/vgplot.html or on https://github.com/volkers/vgplot/doc/vgplot.html
 
 ## License
 

@@ -1,0 +1,456 @@
+
+<html lang="en">
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<title>API for VGPLOT</title>
+<style type="text/css" media="all">
+body {margin: 0 2em .5em 2em;font-family: Verdana,Arial,sans-serif;}
+.package {background: #efefef; 
+          padding: 1.5em 0 1em 0; 
+          text-align: center; 
+          font-size: x-large;}
+.definition {background: #efefef; padding: .3em 1em;}
+a.symbolname, a:visited.symbolname {font-weight: bold;}
+.initargs {font-size: small;}
+.slots {font-size: small;}
+div.label {border-bottom: 1px solid #efefef; margin-bottom: .5em}
+.symboldecl, .footer {margin: 0 2em 2em 2em;}
+.symbolname {font-weight: bold; color: gray;}
+.symboltype {font-style: italic;margin-left: 1.5em; font-size: smaller;}
+.documentation {color: gray; font-family: Fixed,monospace;margin: 0 0 1.5em 0.5em;}
+.packagedocumentation {color: gray; 
+                       font-family: Fixed,monospace;
+                       margin: 0 0 1.5em 0; 
+                       border: 1px solid #efefef; 
+                       padding-left: 1.5em;}
+.symbolcomments span {font-weight: bold;}
+.footer {font-size: x-small; text-align: right; margin-top: 2em; padding-top: 1em; border-top: 1px solid gray;}
+.undocumented {color: red; font-weight: bold;}
+a, a:visited {font-weight: bold; color: gray; text-decoration: none; font-weight: normal;}
+a:hover {border-bottom: 1px solid gray; }
+.label {font-weight: bold; font-style: italic;color: gray;}
+.labeltitle {font-weight: bold; font-style: italic;color: gray; border: 1px solid #efefef; padding: .25em;margin-bottom: .5em}
+.frame {marin-top: 1.5em}
+.expander {border: 2px solid #efefef; color: gray; 
+           font-weight: bold; 
+           font-family: Fixed,monospace; 
+           margin-right: .25em; padding: 0 .25em;cursor: pointer;}
+</style>
+<script type="text/javascript">
+function expand (expander, id) {
+var text = expander.innerHTML;
+if (text == '-')
+{
+  expander.innerHTML = '+';
+  document.getElementById(id).style.display = 'none';
+}
+else
+{
+  expander.innerHTML = '-';
+  document.getElementById(id).style.display = '';
+}
+}</script></head>
+<body>
+<div class="package">
+<div class="definition">API for package: 
+<a class="symbolname" name="vgplot_package" href="#vgplot_package">vgplot</a></div></div>
+<div class="packagedocumentation">
+<pre># vgplot
+
+This common lisp library is an interface to the gnuplot plotting
+utility.
+
+The intention of the API is to resemble to some of the plot commands
+of octave or matlab.
+
+## Usage
+
+(asdf:load-system :vgplot) or (ql:quickload :vgplot)
+
+(vgplot:plot '(1 2 3) '(0 -2 17))
+
+For examples run the demo function:
+
+(vgplot:demo)
+
+and see API documentation in doc/vgplot.html or on https://github.com/volkers/vgplot/doc/vgplot.html
+
+## License
+
+Copyright (C) 2013 - 2020 Volker Sarodnick
+
+mail: (remove #\y (subseq "avoidspamyvolykerysyar@gymyx.net" 9))
+
+GNU General Public License
+</pre></div>
+<div class="frame">
+<div class="labeltitle">
+<span class="expander" onclick="expand(this, 'vars');">-</span>Variables</div>
+<div id="vars">
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="*debug*_vars" href="#*debug*_vars">*debug*</a>: 
+<span class="value">NIL</span>
+<span class="symboltype">variable</span></div>
+<div class="documentation">
+<pre>Actvate debugging when true.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="*gnuplot-binary*_vars" href="#*gnuplot-binary*_vars">*gnuplot-binary*</a>: 
+<span class="value">"gnuplot"</span>
+<span class="symboltype">variable</span></div>
+<div class="documentation">
+<pre>Gnuplot binary. Change when gnuplot not in path.</pre></div></div></div></div>
+<div class="frame">
+<div class="labeltitle">
+<span class="expander" onclick="expand(this, 'functions');">-</span>Functions</div>
+<div id="functions">
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="3d-plot_func" href="#3d-plot_func">3d-plot</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Do a 3d plot.  Uses gnuplot's 'splot'.
+     The inputs are similar to 'plot', but with some key differences:
+vals could be: x y z
+               x y z label-string
+style commands in the label-string work the same as in 'plot'.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="axis_func" href="#axis_func">axis</a>
+<span class="lambdalist">&optional limit-list</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Set axis to limit-list and return actual limit-list, limit-list could be:
+'(xmin xmax) or '(xmin xmax ymin ymax),
+values can be:
+  a number: use it as the corresponding limit
+  nil:      do not change this limit
+  t:        autoscale this limit
+without limit-list do return current axis.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="bar_func" href="#bar_func">bar</a>
+<span class="lambdalist">&key x y (style grouped) (width 0.8) (gap 2.0)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Create a bar plot y = f(x) on active plot, create plot if needed.
+                :x     (optional) vector or list of x strings or numbers
+                       plot to index if not provided
+                :y     list of y '((y &key :label :color) (y &key :label :color) ...)
+                       y      vector or list of y values
+                       :label string for legend label (optional)
+                       :color string defining the color (optional);
+                              must be known by gnuplot, e.g. blue, green, red or cyan
+                :style (optional) "grouped" (default) or "stacked"
+                :width (optional) width of the bars where 1.0 means to fill the space completely
+                       (for the gap in style "grouped" see parameter gap)
+                :gap   (optional, only used in style "grouped") the gap between the groups
+                       in units of width of one boxwidth
+e.g.:
+   (bar :x #("Item 1" "Item 2" "Item 3")
+        :y '((#(0.3 0.2 0.1) :label "Values" :color "blue")
+             (#(0.1 0.2 0.3) :label "Values" :color "red"))
+        :style "stacked"
+        :width 0.6)</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="close-all-plots_func" href="#close-all-plots_func">close-all-plots</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Close all connected gnuplots</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="close-plot_func" href="#close-plot_func">close-plot</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Close connected gnuplot</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="demo_func" href="#demo_func">demo</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Show usecases of vgplot.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="figure_func" href="#figure_func">figure</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add a new plot window to a current one.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="format-plot_func" href="#format-plot_func">format-plot</a>
+<span class="lambdalist">print? text &rest args</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Send a command directly to active gnuplot process, return gnuplots response
+print also response to stdout if print? is true</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="grid_func" href="#grid_func">grid</a>
+<span class="lambdalist">style &key (replot t)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add grid to plot if style t, otherwise remove grid.
+If key parameter replot is true (default) run an additional replot thereafter.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="legend_func" href="#legend_func">legend</a>
+<span class="lambdalist">&rest options</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Provide options to the legend aka keys.
+     :show       Show legend (default)
+     :hide       Hide legend
+     :boxon      Use box around the legend
+     :boxoff     Don't use a box (default)
+     :left       Title left of sample line (default)
+     :right      Title right of sample line
+     :north      Place legend center top
+     :south      Center bottom
+     :east       Right center
+     :west       Left center
+     :northeast  Right top (default)
+     :northwest  Left top
+     :southeast  Right bottom
+     :southwest  Left bottom
+     :at x y     Place legend at position x,y
+     :inside     Place legend inside the plot (default)
+     :outside    Place legend outside the plot</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="load-data-file_func" href="#load-data-file_func">load-data-file</a>
+<span class="lambdalist">fname</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Return a list of found vectors (one vector for one column) in data file fname
+(e.g. a csv-file).
+Datafile fname must hold columns separated by spaces, tabs or commas (other separators may work),
+content after # till end of line is assumed to be a comment and ignored.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="loglog_func" href="#loglog_func">loglog</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Produce a two-dimensional plot using logarithmic scales scale for both axis.
+See the documentation of the plot command for a description of the arguments.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="new-plot_func" href="#new-plot_func">new-plot</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add a new plot window to a current one.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="plot_func" href="#plot_func">plot</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Plot y = f(x) on active plot, create plot if needed.
+vals could be: y                  plot y over its index
+               y label-string     plot y over its index using label-string as label
+               x y                plot y = f(x)
+               x y label-string   plot y = f(x) using label-string as label
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+label:
+A simple label in form of "text" is printed directly.
+
+A label with added style commands: label in form "styles;text;":
+styles can be (combinations possible):
+   "-" lines
+   ":" dotted lines
+   "." dots
+   "+" points
+   "o" circles
+   "r" red
+   "g" green
+   "b" blue
+   "c" cyan
+   "k" black
+
+e.g.:
+   (plot x y "r+;red values;") plots y = f(x) as red points with the
+                                 label "red values"
+</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="plot-file_func" href="#plot-file_func">plot-file</a>
+<span class="lambdalist">data-file &key (x-col)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Plot data-file directly, datafile must hold columns separated by spaces, tabs or commas
+(other separators may work), use with-lines style.
+                :x-col     (optional) column to use as x values.
+                           plot to index if not provided</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="print-plot_func" href="#print-plot_func">print-plot</a>
+<span class="lambdalist">filename &key terminal</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Print the actual plot into filename (a pathname).
+Use the (optional) terminal or if not provided,
+use the extension of filename to guess the terminal type.
+Guessing of terminals works currently for: gif, pdf, png
+
+Examples: (vgplot:print-plot #p"plot.pdf")
+          (vgplot:print-plot #p"plot.eps" :terminal "epscairo")
+
+It is possible to give additional parameters inside the terminal parameter, e.g.:
+(vgplot:print-plot #p"plot.pdf" :terminal "pdfcairo size \"5cm\",\"5cm\"")
+</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="range_func" href="#range_func">range</a>
+<span class="lambdalist">a &optional b (step 1)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Return vector of values in a certain range:
+(range limit) return natural numbers below limit
+(range start limit) return ordinary numbers starting with start below limit
+(range start limit step) return numbers starting with start, successively adding step untill reaching limit (excluding)</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="replot_func" href="#replot_func">replot</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Send the replot command to gnuplot, i.e. apply all recent changes in the plot.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="semilogx_func" href="#semilogx_func">semilogx</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Produce a two-dimensional plot using a logarithmic scale for the X axis.
+See the documentation of the plot command for a description of the arguments.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="semilogy_func" href="#semilogy_func">semilogy</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Produce a two-dimensional plot using a logarithmic scale for the Y axis.
+See the documentation of the plot command for a description of the arguments.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="stairs_func" href="#stairs_func">stairs</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Produce a stairstep plot.
+vals could be: y                  plot y over its index
+               x y                plot y = f(x)
+               x y label-string   plot y = f(x) using label-string as label
+               following parameters add curves to same plot e.g.:
+               x y label x1 y1 label1 ...
+
+For the syntax of label-string see documentation of plot command.
+
+If you only want to prepare the sequences for later plot, see
+function stairs-no-plot.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="stairs-no-plot_func" href="#stairs-no-plot_func">stairs-no-plot</a>
+<span class="lambdalist">yx &optional y</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Prepare a stairstep plot, but don't actually plot it.
+Return a list of 2 sequences, x and y, usable for the later plot.
+
+If one argument is given use it as y sequence, there x are the indices.
+If both arguments are given use yx as x and y is y.
+
+If you want to plot the stairplot directly, see function stairs.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="subplot_func" href="#subplot_func">subplot</a>
+<span class="lambdalist">rows cols index</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Set up a plot grid with rows by cols subwindows and use location index for next plot command.
+The plot index runs row-wise.  First all the columns in a row are
+filled and then the next row is filled.
+
+For example, a plot with 2 rows by 3 cols will have following plot indices:
+
+          +-----+-----+-----+
+          |  0  |  1  |  2  |
+          +-----+-----+-----+
+          |  3  |  4  |  5  |
+          +-----+-----+-----+
+
+Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
+</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="text_func" href="#text_func">text</a>
+<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add text label text-string at position x,y
+optional:
+   :tag nr              label number specifying which text label to modify
+                        (integer you get when running (text-show-label))
+   :horizontalalignment "left"(default), "center" or "right"
+   :rotation degree     rotate text by this angle in degrees (default 0) [if the terminal can do so]
+   :font "<name>" use this font, e.g. :font "Times" [terminal depending, gnuplot help
+                        recommends: http://fontconfig.org/fontconfig-user.html for more information]
+   :fontsize nr
+
+Observe, it could alter the font of the labels (aka legend or key in
+gnuplot terms) if you change font or fontsize of a text field. To
+explicitly chose fontsize (or font) for the label you could use:
+
+(format-plot t "set key font \",10\"")
+(replot)
+</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="text-delete_func" href="#text-delete_func">text-delete</a>
+<span class="lambdalist">&rest tags</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Delete text labels specified by tags.
+A tag is the number of the text label you get when running (text-show-label).</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="text-show-label_func" href="#text-show-label_func">text-show-label</a>
+<span class="lambdalist"></span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Show text labels. This is useful to get the tag number for (text-delete)</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="title_func" href="#title_func">title</a>
+<span class="lambdalist">str &key (replot t)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add title str to plot. If key parameter replot is true (default)
+run an additional replot thereafter.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="xlabel_func" href="#xlabel_func">xlabel</a>
+<span class="lambdalist">str &key (replot t)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add x axis label. If key parameter replot is true (default)
+run an additional replot thereafter.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="ylabel_func" href="#ylabel_func">ylabel</a>
+<span class="lambdalist">str &key (replot t)</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Add y axis label. If key parameter replot is true (default)
+run an additional replot thereafter.</pre></div></div></div></div>
+<div class="footer">Generated by: 
+<a href="http://common-lisp.net/project/cl-api">CL-API</a></div></body></html>

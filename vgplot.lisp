@@ -890,10 +890,17 @@ content after # till end of line is assumed to be a comment and ignored."
 ;; other utilities
 
 (defun make-doc ()
-  "Update README.
-(Generating of html docs is removed because:
-   - cl-api no longer in quicklisp
-   - there is quickdocs)"
-  (with-open-file (stream "README" :direction :output :if-exists :supersede)
-    (write-string (documentation (find-package :vgplot) 't) stream)))
+  "Update README and html documentation. Load cl-api before use."
+  (let ((apigen nil))
+    (ignore-errors
+      ;; dependency to cl-api not defined in asd-file because I don't want getting
+      ;; this dependency (make-doc is internal and should only be used by developer)
+      ;; ignore that :api-gen is probably not loaded in standard case
+      (setq apigen (find-symbol "API-GEN" 'cl-api)))
+    (if apigen
+        (with-open-file (stream "README" :direction :output :if-exists :supersede)
+          (write-string (documentation (find-package :vgplot) 't) stream)
+          (funcall apigen :vgplot "doc/vgplot.html"))
+        (error "CL-API not loaded, but needed for make-doc!"))))
+
 
