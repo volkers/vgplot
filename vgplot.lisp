@@ -900,7 +900,7 @@ content after # till end of line is assumed to be a comment and ignored."
     (if apigen
         (with-open-file (stream "README" :direction :output :if-exists :supersede)
           (write-string (documentation (find-package :vgplot) 't) stream)
-          (funcall apigen :vgplot "doc/vgplot.html"))
+          (funcall apigen :vgplot "docs/vgplot.html"))
         (error "CL-API not loaded, but needed for make-doc!"))))
 
 
