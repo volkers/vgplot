@@ -120,7 +120,7 @@ style commands in the label-string work the same as in 'plot'.</pre></div></div>
 <div class="definition">
 <a class="symbolname" name="axis_func" href="#axis_func">axis</a>
 <span class="lambdalist">&optional limit-list</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Set axis to limit-list and return actual limit-list, limit-list could be:
 '(xmin xmax) or '(xmin xmax ymin ymax),
@@ -172,7 +172,7 @@ e.g.:
 <div class="definition">
 <a class="symbolname" name="demo_func" href="#demo_func">demo</a>
 <span class="lambdalist"></span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Show usecases of vgplot.</pre></div></div>
 <div class="symboldecl">
@@ -194,7 +194,7 @@ print also response to stdout if print? is true</pre></div></div>
 <div class="definition">
 <a class="symbolname" name="grid_func" href="#grid_func">grid</a>
 <span class="lambdalist">style &key (replot t)</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add grid to plot if style t, otherwise remove grid.
 If key parameter replot is true (default) run an additional replot thereafter.</pre></div></div>
@@ -202,7 +202,7 @@ If key parameter replot is true (default) run an additional replot thereafter.</
 <div class="definition">
 <a class="symbolname" name="legend_func" href="#legend_func">legend</a>
 <span class="lambdalist">&rest options</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Provide options to the legend aka keys.
      :show       Show legend (default)
@@ -226,7 +226,7 @@ If key parameter replot is true (default) run an additional replot thereafter.</
 <div class="definition">
 <a class="symbolname" name="load-data-file_func" href="#load-data-file_func">load-data-file</a>
 <span class="lambdalist">fname</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Return a list of found vectors (one vector for one column) in data file fname
 (e.g. a csv-file).
@@ -275,6 +275,9 @@ styles can be (combinations possible):
    "b" blue
    "c" cyan
    "k" black
+   "y" yellow
+   "m" magenta
+   "w" white
 
 e.g.:
    (plot x y "r+;red values;") plots y = f(x) as red points with the
@@ -311,7 +314,7 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
 <div class="definition">
 <a class="symbolname" name="range_func" href="#range_func">range</a>
 <span class="lambdalist">a &optional b (step 1)</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Return vector of values in a certain range:
 (range limit) return natural numbers below limit
@@ -321,7 +324,7 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
 <div class="definition">
 <a class="symbolname" name="replot_func" href="#replot_func">replot</a>
 <span class="lambdalist"></span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Send the replot command to gnuplot, i.e. apply all recent changes in the plot.</pre></div></div>
 <div class="symboldecl">
@@ -344,7 +347,7 @@ See the documentation of the plot command for a description of the arguments.</p
 <div class="definition">
 <a class="symbolname" name="stairs_func" href="#stairs_func">stairs</a>
 <span class="lambdalist">&rest vals</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Produce a stairstep plot.
 vals could be: y                  plot y over its index
@@ -361,7 +364,7 @@ function stairs-no-plot.</pre></div></div>
 <div class="definition">
 <a class="symbolname" name="stairs-no-plot_func" href="#stairs-no-plot_func">stairs-no-plot</a>
 <span class="lambdalist">yx &optional y</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Prepare a stairstep plot, but don't actually plot it.
 Return a list of 2 sequences, x and y, usable for the later plot.
@@ -394,7 +397,7 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 <div class="definition">
 <a class="symbolname" name="text_func" href="#text_func">text</a>
 <span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize)</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add text label text-string at position x,y
 optional:
@@ -417,7 +420,7 @@ explicitly chose fontsize (or font) for the label you could use:
 <div class="definition">
 <a class="symbolname" name="text-delete_func" href="#text-delete_func">text-delete</a>
 <span class="lambdalist">&rest tags</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Delete text labels specified by tags.
 A tag is the number of the text label you get when running (text-show-label).</pre></div></div>
@@ -425,14 +428,14 @@ A tag is the number of the text label you get when running (text-show-label).</p
 <div class="definition">
 <a class="symbolname" name="text-show-label_func" href="#text-show-label_func">text-show-label</a>
 <span class="lambdalist"></span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Show text labels. This is useful to get the tag number for (text-delete)</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="title_func" href="#title_func">title</a>
 <span class="lambdalist">str &key (replot t)</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add title str to plot. If key parameter replot is true (default)
 run an additional replot thereafter.</pre></div></div>
@@ -440,7 +443,7 @@ run an additional replot thereafter.</pre></div></div>
 <div class="definition">
 <a class="symbolname" name="xlabel_func" href="#xlabel_func">xlabel</a>
 <span class="lambdalist">str &key (replot t)</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add x axis label. If key parameter replot is true (default)
 run an additional replot thereafter.</pre></div></div>
@@ -448,7 +451,7 @@ run an additional replot thereafter.</pre></div></div>
 <div class="definition">
 <a class="symbolname" name="ylabel_func" href="#ylabel_func">ylabel</a>
 <span class="lambdalist">str &key (replot t)</span>
-<span class="symboltype">function</span></div>
+<span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add y axis label. If key parameter replot is true (default)
 run an additional replot thereafter.</pre></div></div></div></div>

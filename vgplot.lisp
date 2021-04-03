@@ -162,7 +162,10 @@ Create x if not existing."
           (#\g (setf color "green"))
           (#\b (setf color "blue"))
           (#\c (setf color "cyan"))
-          (#\k (setf color "black")))))
+          (#\k (setf color "black"))
+          (#\y (setf color "yellow"))
+          (#\m (setf color "magenta"))
+          (#\w (setf color "white")))))
     (list :style style :color color :title title)))
 
 (defun get-color-cmd (color)
@@ -416,6 +419,9 @@ styles can be (combinations possible):
    \"b\" blue
    \"c\" cyan
    \"k\" black
+   \"y\" yellow
+   \"m\" magenta
+   \"w\" white
 
 e.g.:
    (plot x y \"r+;red values;\") plots y = f(x) as red points with the
