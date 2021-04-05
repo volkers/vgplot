@@ -143,6 +143,7 @@ Create x if not existing."
   "Parse label string e.g. \"-k;label;\" and return key list (list :style style :color color :title title)."
   (let ((style "lines")
         (color)
+        (rgb)
         (title "")
         (start-title (or (search ";" lbl) -1)) ;; -1 because subseq jumps over first ;
         (end-title (or (search ";" lbl :from-end t) (length lbl))))
@@ -152,20 +153,28 @@ Create x if not existing."
     (setf title (subseq lbl (1+ start-title) end-title))
     (when (> start-title 0)
       (loop for c across (subseq lbl 0 start-title) do
-        (ecase c
-          (#\- (setf style "lines"))
-          (#\: (setf style "lines dt \". . \""))
-          (#\. (setf style "dots"))
-          (#\+ (setf style "points"))
-          (#\o (setf style "circles"))
-          (#\r (setf color "red"))
-          (#\g (setf color "green"))
-          (#\b (setf color "blue"))
-          (#\c (setf color "cyan"))
-          (#\k (setf color "black"))
-          (#\y (setf color "yellow"))
-          (#\m (setf color "magenta"))
-          (#\w (setf color "white")))))
+        (if rgb
+            (progn ;; process rgb string, e.g. "#ff12ff", i.e. 6 hex digits with heading #
+              (setf rgb (concatenate 'string rgb (string c)))
+              (format nil "~a~%" rgb)
+              (when (= 7 (length rgb))
+                (setf color rgb)
+                (setf rgb nil)))
+            (ecase c
+              (#\- (setf style "lines"))
+              (#\: (setf style "lines dt \". . \""))
+              (#\. (setf style "dots"))
+              (#\+ (setf style "points"))
+              (#\o (setf style "circles"))
+              (#\r (setf color "red"))
+              (#\g (setf color "green"))
+              (#\b (setf color "blue"))
+              (#\c (setf color "cyan"))
+              (#\k (setf color "black"))
+              (#\y (setf color "yellow"))
+              (#\m (setf color "magenta"))
+              (#\w (setf color "white"))
+              (#\# (setf rgb "#")))))) ; use rgb string
     (list :style style :color color :title title)))
 
 (defun get-color-cmd (color)
@@ -388,7 +397,7 @@ print also response to stdout if print? is true"
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
-                                      (destructuring-bind (&key style color title) (parse-label (third pl))
+                                      (destructuring-bind (&key style color title) (parse-label  (third pl))
                                         (format nil "\"~A\" with ~A ~A title \"~A\" "
                                               (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
       (format (plot-stream act-plot) "set grid~%")
@@ -422,6 +431,7 @@ styles can be (combinations possible):
    \"y\" yellow
    \"m\" magenta
    \"w\" white
+   \"#RRGGBB\" sets an arbitrary 24-bit RGB color (have to be exactly 6 digits)
 
 e.g.:
    (plot x y \"r+;red values;\") plots y = f(x) as red points with the

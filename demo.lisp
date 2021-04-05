@@ -125,6 +125,9 @@ the following is needed to change the keys back")
          (plot x y "og;y = cos(2x) (new-plot);" #(0 1 2 4 7) #(-1 2 1 -1.2 0) ":r;dotted style;")
          (text 0.5 0.5 "Different line styles" :tag 1))
        (progn
+         (plot x y "#bf0810;# followed by 6 hex digits, e.g. #bf0810;")
+         (text 0.5 0.5 "Use of RGB colors in line style" :tag 1))
+       (progn
          (and "(format-plot) allows direct commands to the running gnuplot process")
          (format-plot t "set size square 0.5,0.5~%")
          (replot))
