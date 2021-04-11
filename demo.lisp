@@ -78,11 +78,13 @@ ENTER continue, all other characters break and quit demo"
        (text 0.5 -0.5 "You can use a different size" :fontsize 14)
        (progn
          (text 0.5 -0.5 "You can change a present label"
-               :tag 1 :rotation 60 :font "Times" :fontsize 12)
+               :tag 1 :rotation 60 :font "Times" :fontsize 12 :color "green")
          (and "font definitions for text change also the font of the legend,
 the following is needed to change the keys back")
          (format-plot t "set key font \",10\"")
          (replot))
+       (and "the :color color command can also send arbitrarily style commands"
+        (text 0.5 -0.5 "Label in the same color as line 1" :tag 1 :color "tc lt 1"))
        (progn
          (text-delete 1)
          (text 3 0.5 "axis can change the range of the x axis")
@@ -136,7 +138,7 @@ the following is needed to change the keys back")
          (plot x y "w;" #(0 1 2 4 7) #(-1 2 1 -1.2 0) "y;")
          (format-plot t "set object rectangle from screen 0,0 to screen 1,1 fillcolor 'black' behind")
          (format-plot t "set border lc 'white'")
-         (format-plot t "set label 'Another example for use of format-plot commands' at 2.5,1.5 tc 'white'")
+         (text 2.5 1.5 "Another example for use of format-plot commands" :color "white")
          (vgplot:replot))
        (close-all-plots)
        (let ((x #(1 2 3 4)))

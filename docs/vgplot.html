@@ -397,7 +397,7 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 <div class="symboldecl">
 <div class="definition">
 <a class="symbolname" name="text_func" href="#text_func">text</a>
-<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize)</span>
+<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize) (color)</span>
 <span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add text label text-string at position x,y
@@ -409,6 +409,10 @@ optional:
    :font "<name>" use this font, e.g. :font "Times" [terminal depending, gnuplot help
                         recommends: http://fontconfig.org/fontconfig-user.html for more information]
    :fontsize nr
+   :color "color"     one of red, green, blue, cyan, black, yellow or white
+                        an unrecogniced color is send unchanged to gnuplot, this can be used to get other colors or effects, e.g:
+                        "tc rgb '#112233'"  gives color with the RGB code 0x112233 (0xRRGGBB)
+                        "tc lt 1" gives the same color as line 1
 
 Observe, it could alter the font of the labels (aka legend or key in
 gnuplot terms) if you change font or fontsize of a text field. To

@@ -183,6 +183,19 @@ Create x if not existing."
       (format nil " linecolor rgb \"~A\"" color)
       ""))
 
+(defun get-tc-rgb-cmd (color-name)
+  "Return textcolor rgb command string for color name or unchanged color-string when not found"
+  (cond
+    ((equal color-name "red") "tc rgb '#ff0000'")
+    ((equal color-name "green") "tc rgb '#00ff00'")
+    ((equal color-name "blue") "tc rgb '#0000ff'")
+    ((equal color-name "cyan") "tc rgb '#00ffff'")
+    ((equal color-name "black") "tc rgb '#000000'")
+    ((equal color-name "yellow") "tc rgb '#ffff00'")
+    ((equal color-name "magenta") "tc rgb '#ff00ff'")
+    ((equal color-name "white") "tc rgb '#ffffff'")
+    (t color-name))) ; unchanged string if not found
+
 (defun parse-floats (s sep)
   "Parse string s and return the found numbers separated by separator"
   (let ((c-list)
@@ -774,7 +787,7 @@ run an additional replot thereafter."
   (when replot
     (replot)))
 
-(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize))
+(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize) (color))
   "Add text label text-string at position x,y
 optional:
    :tag nr              label number specifying which text label to modify
@@ -784,6 +797,10 @@ optional:
    :font \"<name>\" use this font, e.g. :font \"Times\" [terminal depending, gnuplot help
                         recommends: http://fontconfig.org/fontconfig-user.html for more information]
    :fontsize nr
+   :color \"color\"     one of red, green, blue, cyan, black, yellow or white
+                        an unrecogniced color is send unchanged to gnuplot, this can be used to get other colors or effects, e.g:
+                        \"tc rgb '#112233'\"  gives color with the RGB code 0x112233 (0xRRGGBB)
+                        \"tc lt 1\" gives the same color as line 1
 
 Observe, it could alter the font of the labels (aka legend or key in
 gnuplot terms) if you change font or fontsize of a text field. To
@@ -799,8 +816,9 @@ explicitly chose fontsize (or font) for the label you could use:
         (al-str (format nil " ~a " horizontalalignment))
         (rot-str (format nil " rotate by ~a " rotation))
         (font-str (and (or font fontsize)
-                       (format nil " font \"~a,~a\" " (or font "") (or fontsize "")))))
-    (format-plot *debug* (concatenate 'string cmd-str tag-str text-str at-str al-str rot-str font-str)))
+                       (format nil " font \"~a,~a\" " (or font "") (or fontsize ""))))
+        (color-str (format nil " ~a " (get-tc-rgb-cmd color))))
+    (format-plot *debug* (concatenate 'string cmd-str tag-str text-str at-str al-str rot-str font-str color-str)))
   (replot))
 
 (defun text-show-label ()
