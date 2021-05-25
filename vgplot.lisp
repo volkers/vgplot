@@ -512,15 +512,15 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
            (terminals '(("gif" . "gif")
                         ("pdf" . "pdfcairo")
                         ("png" . "png"))))
-      (vgplot:format-plot t "set terminal ~A"
+      (vgplot:format-plot *debug* "set terminal ~A"
                           (or terminal
                               (cdr (assoc extension terminals :test #'string=))
                               (error "Provide a terminal to print to (no terminal given and guessing failed)!")))
-      (vgplot:format-plot t "set output \"~A\"" filename-string)
-      (vgplot:format-plot t "refresh")
-      (vgplot:format-plot t "unset output")
+      (vgplot:format-plot *debug* "set output \"~A\"" filename-string)
+      (vgplot:format-plot *debug* "refresh")
+      (vgplot:format-plot *debug* "unset output")
       ;; and back to original terminal:
-      (vgplot:format-plot t "set terminal ~A" old-terminal)))
+      (vgplot:format-plot *debug* "set terminal ~A" old-terminal)))
 
   (defun semilogx (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the X axis.
@@ -592,14 +592,14 @@ e.g. \(combine-col '((1 2 3) (a b c d) (x y z)))
                      x (extract-y-val y)))
               (tmp-file-list act-plot))
         (setf plt-file (first (tmp-file-list act-plot)))
-        (format-plot t "set style fill solid 1.00 border lt -1")
-        (format-plot t "set grid")
-        (format-plot t "set boxwidth ~A absolute" width)
-        (format-plot t style-cmd)
-        (format-plot t "set style data histograms")
+        (format-plot *debug* "set style fill solid 1.00 border lt -1")
+        (format-plot *debug* "set grid")
+        (format-plot *debug* "set boxwidth ~A absolute" width)
+        (format-plot *debug* style-cmd)
+        (format-plot *debug* "set style data histograms")
         ;; gnuplot command shall be e.g.:
         ;; plot 'data.txt' using 2:xtic(1) linecolor rgb 'blue' title 'label1', 'data.txt' using 3:xtic(1) linecolor rgb 'green' title 'label2'
-        (format-plot t
+        (format-plot *debug*
                      (reduce #'(lambda (s1 s2) (concatenate 'string s1 s2))
                              (loop
                                 for col-num from 2 to (1+ n-bars) ;; columns start at 2 in the command
@@ -767,7 +767,7 @@ If key parameter replot is true (default) run an additional replot thereafter."
                                  (or (getf opt-tbl (first opts))
                                      (error "Unrecognized option ~A" (first opts)))
                                  (parse-opts (rest opts)))))))
-      (format-plot t "set key ~A" (parse-opts options))
+      (format-plot *debug* "set key ~A" (parse-opts options))
       (replot))))
 (defun title (str &key (replot t))
   "Add title str to plot. If key parameter replot is true (default)
