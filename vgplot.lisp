@@ -506,12 +506,10 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
     (assert (pathnamep filename))
     (let* ((filename-string (namestring filename))
            (extension (cl-ppcre:scan-to-strings "\\w+$" filename-string))
-           (old-terminal (first (cl-ppcre:all-matches-as-strings
-                                 "(?<=terminal type is ).*"
-                                 (format-plot *debug* "set terminal"))))
            (terminals '(("gif" . "gif")
                         ("pdf" . "pdfcairo")
                         ("png" . "png"))))
+      (vgplot:format-plot *debug* "set terminal push")
       (vgplot:format-plot *debug* "set terminal ~A"
                           (or terminal
                               (cdr (assoc extension terminals :test #'string=))
@@ -520,7 +518,7 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
       (vgplot:format-plot *debug* "refresh")
       (vgplot:format-plot *debug* "unset output")
       ;; and back to original terminal:
-      (vgplot:format-plot *debug* "set terminal ~A" old-terminal)))
+      (vgplot:format-plot *debug* "set terminal pop")))
 
   (defun semilogx (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the X axis.
