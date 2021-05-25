@@ -508,9 +508,9 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
            (extension (cl-ppcre:scan-to-strings "\\w+$" filename-string))
            (old-terminal (first (cl-ppcre:all-matches-as-strings
                                  "(?<=terminal type is ).*"
-                                 (format-plot *debug* "show terminal"))))
+                                 (format-plot *debug* "set terminal"))))
            (terminals '(("gif" . "gif")
-                        ("pdf" . "pdf")
+                        ("pdf" . "pdfcairo")
                         ("png" . "png"))))
       (vgplot:format-plot t "set terminal ~A"
                           (or terminal
