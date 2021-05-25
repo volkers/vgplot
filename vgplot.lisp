@@ -793,7 +793,7 @@ run an additional replot thereafter."
   (when replot
     (replot)))
 
-(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize) (color))
+(defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize) (color ""))
   "Add text label text-string at position x,y
 optional:
    :tag nr              label number specifying which text label to modify
