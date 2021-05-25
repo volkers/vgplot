@@ -310,7 +310,7 @@ function stairs-no-plot."
                     (push x p-list)
                     (push y p-list)
                     (construct-plist p-list (rest (rest pars))))))))
-      (format-plot nil "set nologscale") ; ensure that there is no log scaling from plotting before active
+      (format-plot *debug* "set nologscale") ; ensure that there is no log scaling from plotting before active
       (apply #'do-plot (construct-plist par-list (vectorize vals))))))
 
 (defun stairs-no-plot (yx &optional y)
@@ -372,7 +372,10 @@ print also response to stdout if print? is true"
     (fresh-line (plot-stream act-plot))
     (force-output (plot-stream act-plot))
     (if print?
-        (read-n-print-no-hang (plot-stream act-plot))
+        (progn
+          (apply #'format t text args)
+          (format t "~%")
+          (read-n-print-no-hang (plot-stream act-plot)))
         (read-no-hang (plot-stream act-plot))))
   (defun close-plot ()
     "Close connected gnuplot"
@@ -413,7 +416,9 @@ print also response to stdout if print? is true"
                                       (destructuring-bind (&key style color title) (parse-label  (third pl))
                                         (format nil "\"~A\" with ~A ~A title \"~A\" "
                                               (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
-      (format (plot-stream act-plot) "set grid~%")
+      (format-plot *debug* "set grid~%")
+      (when *debug*
+        (format t  "~A~%" plt-cmd))
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
@@ -450,7 +455,7 @@ e.g.:
    (plot x y \"r+;red values;\") plots y = f(x) as red points with the
                                  label \"red values\"
 "
-    (format-plot nil "set nologscale")
+    (format-plot *debug* "set nologscale")
     (multiple-value-call #'do-plot (values-list vals)))
   (defun 3d-plot (&rest vals)
     "Do a 3d plot.  Uses gnuplot's 'splot'.
@@ -458,7 +463,7 @@ e.g.:
 vals could be: x y z
                x y z label-string
 style commands in the label-string work the same as in 'plot'."
-    (format-plot nil "set nologscale")
+    (format-plot *debug* "set nologscale")
     (if act-plot
         (unless (multiplot-p act-plot)
           (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
@@ -479,8 +484,9 @@ style commands in the label-string work the same as in 'plot'."
                                       (destructuring-bind (&key style color title) (parse-label (fourth pl))
                                         (format nil "\"~A\" with ~A ~A title \"~A\" "
                                                 (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
-      (format (plot-stream act-plot) "set grid~%")
-      ;; (format t "~A~%" plt-cmd)
+      (format-plot *debug* "set grid~%")
+      (when *debug*
+        (format t  "~A~%" plt-cmd))
       (format (plot-stream act-plot) "~A~%" plt-cmd)
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
@@ -502,7 +508,7 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
            (extension (cl-ppcre:scan-to-strings "\\w+$" filename-string))
            (old-terminal (first (cl-ppcre:all-matches-as-strings
                                  "(?<=terminal type is ).*"
-                                 (format-plot nil "show terminal"))))
+                                 (format-plot *debug* "show terminal"))))
            (terminals '(("gif" . "gif")
                         ("pdf" . "pdf")
                         ("png" . "png"))))
@@ -519,19 +525,19 @@ It is possible to give additional parameters inside the terminal parameter, e.g.
   (defun semilogx (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the X axis.
 See the documentation of the plot command for a description of the arguments."
-    (format-plot nil "set logscale x")
-    (format-plot nil "set nologscale y")
+    (format-plot *debug* "set logscale x")
+    (format-plot *debug* "set nologscale y")
     (multiple-value-call #'do-plot (values-list vals)))
   (defun semilogy (&rest vals)
     "Produce a two-dimensional plot using a logarithmic scale for the Y axis.
 See the documentation of the plot command for a description of the arguments."
-    (format-plot nil "set nologscale x")
-    (format-plot nil "set logscale y")
+    (format-plot *debug* "set nologscale x")
+    (format-plot *debug* "set logscale y")
     (multiple-value-call #'do-plot (values-list vals)))
   (defun loglog (&rest vals)
     "Produce a two-dimensional plot using logarithmic scales scale for both axis.
 See the documentation of the plot command for a description of the arguments."
-    (format-plot nil "set logscale xy")
+    (format-plot *debug* "set logscale xy")
     (multiple-value-call #'do-plot (values-list vals)))
   (defun bar (&key x y (style "grouped") (width 0.8) (gap 2.0))
     "Create a bar plot y = f(x) on active plot, create plot if needed.
@@ -640,12 +646,12 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
       (unless act-plot
         (setf act-plot (make-plot)))
       (unless (multiplot-p act-plot)
-        (format (plot-stream act-plot) "set multiplot~%")
+        (format-plot *debug* "set multiplot~%")
         (setf (multiplot-p act-plot) t))
       (read-n-print-no-hang (plot-stream act-plot))
-      (format (plot-stream act-plot) "set size ~A,~A~%" x-size y-size)
+      (format-plot *debug* "set size ~A,~A~%" x-size y-size)
       (read-n-print-no-hang (plot-stream act-plot))
-      (format (plot-stream act-plot) "set origin ~A,~A~%" x-orig y-orig)
+      (format-plot *debug* "set origin ~A,~A~%" x-orig y-orig)
       (read-n-print-no-hang (plot-stream act-plot))
       (force-output (plot-stream act-plot))
       (read-n-print-no-hang (plot-stream act-plot))))
@@ -683,12 +689,12 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 
       (unless act-plot
 	(setf act-plot (make-plot)))
-      (format (plot-stream act-plot) "set grid~%")
+      (format-plot *debug* "set grid~%")
       (when (characterp separator)
-        (format (plot-stream act-plot) "set datafile separator \"~A\"~%" separator))
-      (format (plot-stream act-plot) "~A~%" cmd-string)
+        (format-plot *debug* "set datafile separator \"~A\"~%" separator))
+      (format-plot *debug* "~A~%" cmd-string)
       (when (characterp separator)
-        (format (plot-stream act-plot) "set datafile separator~%")) ; reset separator
+        (format-plot *debug* "set datafile separator~%")) ; reset separator
       (force-output (plot-stream act-plot)))
   (read-n-print-no-hang (plot-stream act-plot)))
 )
