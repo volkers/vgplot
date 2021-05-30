@@ -373,8 +373,9 @@ print also response to stdout if print? is true"
     (force-output (plot-stream act-plot))
     (if print?
         (progn
-          (apply #'format t text args)
-          (format t "~%")
+          (when *debug*
+            (apply #'format t text args)
+            (format t "~%"))
           (read-n-print-no-hang (plot-stream act-plot)))
         (read-no-hang (plot-stream act-plot))))
   (defun close-plot ()
