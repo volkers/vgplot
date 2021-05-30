@@ -74,7 +74,7 @@ ENTER continue, all other characters break and quit demo"
        (and "text-show-labels shows the active labels and their tags"
         (text-show-label))
        (and "Usefull to delete or change labels"
-        (text-delete 1 2 3))
+        (text-delete 1 2))
        (text 0.5 -0.5 "You can use a different size" :fontsize 14)
        (progn
          (text 0.5 -0.5 "You can change a present label"
