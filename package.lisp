@@ -45,6 +45,9 @@ GNU General Public License
            :legend
            :load-data-file
            :loglog
+           :meshgrid-x
+           :meshgrid-y
+           :meshgrid-map
            :new-plot
            :plot
            :plot-file

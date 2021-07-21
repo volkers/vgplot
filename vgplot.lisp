@@ -925,6 +925,28 @@ content after # till end of line is assumed to be a comment and ignored."
          (incf a step))
     vec))
 
+;; todo: would it be better combining both to meshgrid?
+;; todo: add examples in doc strings
+(defun meshgrid-x (x y)
+  "Helper function for a surface plot (surf).
+Given vectors of X and Y coordinates, return vector XX for a 2-D grid.
+The subvectors of XX are copies of X.
+Usually used in combination with meshgrid-y"
+  (make-sequence 'vector (length y) :initial-element x))
+
+(defun meshgrid-y (x y)
+  "Helper function for a surface plot (surf).
+Given vectors of X and Y coordinates, return vector YY
+for a 2-D grid.
+The corresponding elements of the subvectors of YY are copies of Y.
+Usually used in combination with meshgrid-x"
+  (loop with xi for yi across y do (setf xi (make-sequence 'vector (length x) :initial-element yi)) collect xi))
+
+(defun meshgrid-map (fun xx yy)
+  "Helper function for a surface plot (surf).
+Map fun to every pair of elements of the subvectors of xx and yy and return the corresponding vector zz."
+  (map 'vector #'(lambda (x y) (map 'vector fun x y)) xx yy))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; other utilities
 
