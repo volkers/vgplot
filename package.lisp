@@ -59,6 +59,7 @@ GNU General Public License
            :stairs
            :stairs-no-plot
            :subplot
+           :surf
            :text
            :text-delete
            :text-show-label

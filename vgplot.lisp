@@ -492,6 +492,44 @@ style commands in the label-string work the same as in 'plot'."
       (force-output (plot-stream act-plot))
       (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
     (read-n-print-no-hang (plot-stream act-plot)))
+  (defun surf (&rest vals)
+    "Plot a 3-D surface mesh.
+Vals could be: xx yy zz
+               xx yy zz label-string
+where xx, yy and zz are vectors of subverctors usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
+more explanation..."
+    (format-plot *debug* "set nologscale")
+    (if act-plot
+        (unless (multiplot-p act-plot)
+          (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
+        (setf act-plot (make-plot)))
+    (let ((val-l (parse-vals-3d (vectorize vals)))
+          (plt-cmd))
+      (loop for pl in val-l do
+        ;; (format t "~a~%" val-l)
+        (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+                (loop for x across (first pl) ; first is xx, x one vector
+                      for y across (second pl) ; second is yy, y one vector
+                      for z across (third pl) ; third is zz, z one vector of points
+                      do (loop for xi across x
+                               for yi across y
+                               for zi across z
+                               do (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE ~,,,,,,'eE~%"  xi yi zi)
+                               finally (format tmp-file-stream "~%")))) ; an empty line between the surface lines
+              (tmp-file-list act-plot))
+              (setf plt-cmd (concatenate 'string (if plt-cmd
+                                                     (concatenate 'string plt-cmd ", ")
+                                                     "splot ")
+                                         (destructuring-bind (&key style color title) (parse-label (fourth pl))
+                                           (format nil "\"~A\" with lines ~A title \"~A\" "
+                                                   (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
+      (format-plot *debug* "set grid~%")
+      (when *debug*
+        (format t  "~A~%" plt-cmd))
+      (format (plot-stream act-plot) "~A~%" plt-cmd)
+      (force-output (plot-stream act-plot))
+      (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
+    (read-n-print-no-hang (plot-stream act-plot)))
   (defun print-plot (filename &key terminal)
     "Print the actual plot into filename (a pathname).
 Use the (optional) terminal or if not provided,
