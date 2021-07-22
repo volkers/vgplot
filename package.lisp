@@ -66,4 +66,5 @@ GNU General Public License
            :title
            :xlabel
            :ylabel
+           :zlabel
            :3d-plot))

@@ -191,6 +191,7 @@ the following is needed to change the keys back")
          (format-plot nil "set label 1 'This is equal to (0,0,1)' at -5,-2,1.5 centre")
          (xlabel "x")
          (ylabel "y")
+         (zlabel "z")
          (title "Example of a surface plot (the famous sombrero)"))
        (close-plot)
        (progn

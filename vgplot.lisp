@@ -814,21 +814,27 @@ run an additional replot thereafter."
   (when replot
     (replot)))
 
+(defun set-label (label str replot)
+  "Set label label to string, replot if replot is true."
+  (format-plot *debug* "set ~A \"~A\"" label str)
+  (format-plot *debug* "show ~A" label)
+  (when replot
+    (replot)))
+
 (defun xlabel (str &key (replot t))
   "Add x axis label. If key parameter replot is true (default)
 run an additional replot thereafter."
-  (format-plot *debug* "set xlabel \"~A\"" str)
-  (format-plot *debug* "show xlabel")
-  (when replot
-    (replot)))
+  (set-label "xlabel" str replot))
 
 (defun ylabel (str &key (replot t))
   "Add y axis label. If key parameter replot is true (default)
 run an additional replot thereafter."
-  (format-plot *debug* "set ylabel \"~A\"" str)
-  (format-plot *debug* "show ylabel")
-  (when replot
-    (replot)))
+  (set-label "ylabel" str replot))
+
+(defun zlabel (str &key (replot t))
+  "Add z axis label. If key parameter replot is true (default)
+run an additional replot thereafter."
+  (set-label "zlabel" str replot))
 
 (defun text (x y text-string &key (tag) (horizontalalignment "left") (rotation 0) (font) (fontsize) (color ""))
   "Add text label text-string at position x,y
