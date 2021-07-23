@@ -496,8 +496,43 @@ style commands in the label-string work the same as in 'plot'."
     "Plot a 3-D surface mesh.
 Vals could be: xx yy zz
                xx yy zz label-string
-where xx, yy and zz are vectors of subverctors usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
-more explanation..."
+
+xx, yy and zz are vectors of subverctors usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
+All 3 vectors have to have the same form:
+xx: #( #(x0  x1  x2  ... xn)
+       #(x0  x1  x2  ... xn)
+       ...
+       #(x0  x1  x2  ... xn))
+yy: #( #(y0  y0  y0  ... y0)
+       #(y1  y1  y1  ... y1)
+       ...
+       #(ym  ym  ym  ... ym))
+zz: #( #(z00 z01 z02 ... z0n)
+       #(z10 z11 z12 ... z1n)
+       ...
+       #(zm0 zm1 zm2 ... zmn))
+
+Example 1: Plot some measurement data:
+  (let* ((x #(1.0 2.0 3.0))
+         (y #(0.0 2.0 4.0 6.0))
+         (zz #(#(2.0 1.5 1.1) #(1.8 1.2 1.2) #(1.7 1.0 1.0) #(1.8 0.9 0.7)))
+         (xx (vgplot:meshgrid-x x y))
+         (yy (vgplot:meshgrid-y x y)))
+     (vgplot:surf xx yy zz))
+
+Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
+  (let* ((eps double-float-epsilon)
+         (fun #'(lambda (x y) (/ (sin (sqrt (+ (* x x) (* y y) eps))) (sqrt (+ (* x x) (* y y) eps)))))
+         (x (vgplot:range -8 8 0.2))
+         (y (vgplot:range -8 8 0.2))
+         (xx (vgplot:meshgrid-x x y))
+         (yy (vgplot:meshgrid-y x y))
+         (zz (vgplot:meshgrid-map fun xx yy)))
+    (vgplot:surf xx yy zz)
+    (vgplot:format-plot nil \"set hidden3d\")
+    (vgplot:format-plot nil \"set pm3d\")
+    (vgplot:replot))
+"
     (format-plot *debug* "set nologscale")
     (if act-plot
         (unless (multiplot-p act-plot)
@@ -969,13 +1004,12 @@ content after # till end of line is assumed to be a comment and ignored."
          (incf a step))
     vec))
 
-;; todo: would it be better combining both to meshgrid?
-;; todo: add examples in doc strings
 (defun meshgrid-x (x y)
   "Helper function for a surface plot (surf).
 Given vectors of X and Y coordinates, return vector XX for a 2-D grid.
 The subvectors of XX are copies of X.
-Usually used in combination with meshgrid-y"
+Usually used in combination with meshgrid-y.
+See surf for examples."
   (make-sequence 'vector (length y) :initial-element x))
 
 (defun meshgrid-y (x y)
@@ -983,12 +1017,14 @@ Usually used in combination with meshgrid-y"
 Given vectors of X and Y coordinates, return vector YY
 for a 2-D grid.
 The corresponding elements of the subvectors of YY are copies of Y.
-Usually used in combination with meshgrid-x"
+Usually used in combination with meshgrid-x.
+See surf for examples."
   (loop with xi for yi across y do (setf xi (make-sequence 'vector (length x) :initial-element yi)) collect xi))
 
 (defun meshgrid-map (fun xx yy)
   "Helper function for a surface plot (surf).
-Map fun to every pair of elements of the subvectors of xx and yy and return the corresponding vector zz."
+Map fun to every pair of elements of the subvectors of xx and yy and return the corresponding vector zz.
+See surf for an example."
   (map 'vector #'(lambda (x y) (map 'vector fun x y)) xx yy))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;

@@ -242,6 +242,38 @@ content after # till end of line is assumed to be a comment and ignored.</pre></
 See the documentation of the plot command for a description of the arguments.</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
+<a class="symbolname" name="meshgrid-map_func" href="#meshgrid-map_func">meshgrid-map</a>
+<span class="lambdalist">fun xx yy</span>
+<span class="symboltype">compiled-function</span></div>
+<div class="documentation">
+<pre>Helper function for a surface plot (surf).
+Map fun to every pair of elements of the subvectors of xx and yy and return the corresponding vector zz.
+See surf for an example.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="meshgrid-x_func" href="#meshgrid-x_func">meshgrid-x</a>
+<span class="lambdalist">x y</span>
+<span class="symboltype">compiled-function</span></div>
+<div class="documentation">
+<pre>Helper function for a surface plot (surf).
+Given vectors of X and Y coordinates, return vector XX for a 2-D grid.
+The subvectors of XX are copies of X.
+Usually used in combination with meshgrid-y.
+See surf for examples.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="meshgrid-y_func" href="#meshgrid-y_func">meshgrid-y</a>
+<span class="lambdalist">x y</span>
+<span class="symboltype">compiled-function</span></div>
+<div class="documentation">
+<pre>Helper function for a surface plot (surf).
+Given vectors of X and Y coordinates, return vector YY
+for a 2-D grid.
+The corresponding elements of the subvectors of YY are copies of Y.
+Usually used in combination with meshgrid-x.
+See surf for examples.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
 <a class="symbolname" name="new-plot_func" href="#new-plot_func">new-plot</a>
 <span class="lambdalist"></span>
 <span class="symboltype">function</span></div>
@@ -396,8 +428,55 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 </pre></div></div>
 <div class="symboldecl">
 <div class="definition">
+<a class="symbolname" name="surf_func" href="#surf_func">surf</a>
+<span class="lambdalist">&rest vals</span>
+<span class="symboltype">function</span></div>
+<div class="documentation">
+<pre>Plot a 3-D surface mesh.
+Vals could be: xx yy zz
+               xx yy zz label-string
+
+xx, yy and zz are vectors of subverctors usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
+All 3 vectors have to have the same form:
+xx: #( #(x0  x1  x2  ... xn)
+       #(x0  x1  x2  ... xn)
+       ...
+       #(x0  x1  x2  ... xn))
+yy: #( #(y0  y0  y0  ... y0)
+       #(y1  y1  y1  ... y1)
+       ...
+       #(ym  ym  ym  ... ym))
+zz: #( #(z00 z01 z02 ... z0n)
+       #(z10 z11 z12 ... z1n)
+       ...
+       #(zm0 zm1 zm2 ... zmn))
+
+Example 1: Plot some measurement data:
+  (let* ((x #(1.0 2.0 3.0))
+         (y #(0.0 2.0 4.0 6.0))
+         (zz #(#(2.0 1.5 1.1) #(1.8 1.2 1.2) #(1.7 1.0 1.0) #(1.8 0.9 0.7)))
+         (xx (vgplot:meshgrid-x x y))
+         (yy (vgplot:meshgrid-y x y)))
+     (vgplot:surf xx yy zz))
+
+Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
+  (let* ((eps double-float-epsilon)
+         (fun #'(lambda (x y) (/ (sin (sqrt (+ (* x x) (* y y) eps))) (sqrt (+ (* x x) (* y y) eps)))))
+         (x (vgplot:range -8 8 0.2))
+         (y (vgplot:range -8 8 0.2))
+         (xx (vgplot:meshgrid-x x y))
+         (yy (vgplot:meshgrid-y x y))
+         (zz (vgplot:meshgrid-map fun xx yy)))
+    (vgplot:surf xx yy zz)
+    (vgplot:format-plot nil "set hidden3d")
+    (vgplot:format-plot nil "set pm3d")
+    (vgplot:replot))
+</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
 <a class="symbolname" name="text_func" href="#text_func">text</a>
-<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize) (color)</span>
+<span class="lambdalist">x y text-string &key (tag) (horizontalalignment left) (rotation 0) (font) (fontsize) (color
+                                                                                      )</span>
 <span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add text label text-string at position x,y
@@ -459,6 +538,14 @@ run an additional replot thereafter.</pre></div></div>
 <span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Add y axis label. If key parameter replot is true (default)
+run an additional replot thereafter.</pre></div></div>
+<div class="symboldecl">
+<div class="definition">
+<a class="symbolname" name="zlabel_func" href="#zlabel_func">zlabel</a>
+<span class="lambdalist">str &key (replot t)</span>
+<span class="symboltype">compiled-function</span></div>
+<div class="documentation">
+<pre>Add z axis label. If key parameter replot is true (default)
 run an additional replot thereafter.</pre></div></div></div></div>
 <div class="footer">Generated by: 
 <a href="http://common-lisp.net/project/cl-api">CL-API</a></div></body></html>
