@@ -497,25 +497,25 @@ style commands in the label-string work the same as in 'plot'."
 Vals could be: xx yy zz
                xx yy zz label-string
 
-xx, yy and zz are vectors of subverctors usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
-All 3 vectors have to have the same form:
-xx: #( #(x0  x1  x2  ... xn)
-       #(x0  x1  x2  ... xn)
-       ...
-       #(x0  x1  x2  ... xn))
-yy: #( #(y0  y0  y0  ... y0)
-       #(y1  y1  y1  ... y1)
-       ...
-       #(ym  ym  ym  ... ym))
-zz: #( #(z00 z01 z02 ... z0n)
-       #(z10 z11 z12 ... z1n)
-       ...
-       #(zm0 zm1 zm2 ... zmn))
+xx, yy and zz are 2 dimensional arrays usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
+All 3 arrays have to have the same form where the rows follow the x direction and the columns the y.
+xx: #2A((x0  x0  x0  ... x0)
+        (x1  x1  x1  ... x1)
+        ...
+        (xn  xn  xn  ... xn))
+yy: #2A((y0  y1  y2  ... ym)
+        (y0  y1  y2  ... ym)
+        ...
+        (y0  y1  y2  ... ym))
+zz: #2A((z00 z01 z02 ... z0m)
+        (z10 z11 z12 ... z1m)
+        ...
+        (zn0 zn1 zn2 ... znm))
 
 Example 1: Plot some measurement data:
   (let* ((x #(1.0 2.0 3.0))
          (y #(0.0 2.0 4.0 6.0))
-         (zz #(#(2.0 1.5 1.1) #(1.8 1.2 1.2) #(1.7 1.0 1.0) #(1.8 0.9 0.7)))
+         (zz (make-array (list (length x) (length y)) :initial-contents '((0.8 1.5 1.7 2.8) (1.8 1.2 1.2 2.1) (1.7 1.0 1.0 1.9))))
          (xx (vgplot:meshgrid-x x y))
          (yy (vgplot:meshgrid-y x y)))
      (vgplot:surf xx yy zz))
@@ -538,27 +538,31 @@ Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
         (unless (multiplot-p act-plot)
           (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
         (setf act-plot (make-plot)))
-    (let ((val-l (parse-vals-3d (vectorize vals)))
+    (let ((val-l (parse-vals-3d vals))
           (plt-cmd))
       (loop for pl in val-l do
-        ;; (format t "~a~%" val-l)
         (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
-                (loop for x across (first pl) ; first is xx, x one vector
-                      for y across (second pl) ; second is yy, y one vector
-                      for z across (third pl) ; third is zz, z one vector of points
-                      do (loop for xi across x
-                               for yi across y
-                               for zi across z
-                               do (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE ~,,,,,,'eE~%"  xi yi zi)
-                               finally (format tmp-file-stream "~%")))) ; an empty line between the surface lines
-              (tmp-file-list act-plot))
-              (setf plt-cmd (concatenate 'string (if plt-cmd
+                (let* ((xx (first pl))
+                       (yy (second pl))
+                       (zz (third pl))
+                       (x-len (array-dimension xx 0))
+                       (y-len (array-dimension xx 1)))
+                  (dotimes (y-idx y-len)
+                    (progn
+                      (dotimes (x-idx x-len)
+                        (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE ~,,,,,,'eE~%"
+                                (aref xx x-idx y-idx)
+                                (aref yy x-idx y-idx)
+                                (aref zz x-idx y-idx)))
+                      (format tmp-file-stream "~%"))))) ; an empty line between the surface lines
+                (tmp-file-list act-plot))
+        (setf plt-cmd (concatenate 'string (if plt-cmd
                                                      (concatenate 'string plt-cmd ", ")
                                                      "splot ")
                                          (destructuring-bind (&key style color title) (parse-label (fourth pl))
                                            (format nil "\"~A\" with lines ~A title \"~A\" "
                                                    (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
-      (format-plot *debug* "set grid~%")
+        (format-plot *debug* "set grid~%")
       (when *debug*
         (format t  "~A~%" plt-cmd))
       (format (plot-stream act-plot) "~A~%" plt-cmd)
@@ -1006,26 +1010,37 @@ content after # till end of line is assumed to be a comment and ignored."
 
 (defun meshgrid-x (x y)
   "Helper function for a surface plot (surf).
-Given vectors of X and Y coordinates, return vector XX for a 2-D grid.
-The subvectors of XX are copies of X.
+Given vectors of X and Y coordinates, return array XX for a 2-D grid.
+The columns of XX are copies of X.
 Usually used in combination with meshgrid-y.
 See surf for examples."
-  (make-sequence 'vector (length y) :initial-element x))
+  (let ((x-len (length x))
+        (y-len (length y)))
+    (make-array (list x-len y-len) :initial-contents (loop with yi for xi across x do (setf yi (make-sequence 'vector y-len :initial-element xi)) collect yi))))
 
 (defun meshgrid-y (x y)
   "Helper function for a surface plot (surf).
-Given vectors of X and Y coordinates, return vector YY
-for a 2-D grid.
-The corresponding elements of the subvectors of YY are copies of Y.
+Given vectors of X and Y coordinates, return array YY for a 2-D grid.
+The rows of YY are copies of Y.
 Usually used in combination with meshgrid-x.
 See surf for examples."
-  (loop with xi for yi across y do (setf xi (make-sequence 'vector (length x) :initial-element yi)) collect xi))
+  (let ((x-len (length x))
+        (y-len (length y)))
+    (make-array (list x-len y-len) :initial-contents (make-sequence 'vector x-len :initial-element y))))
 
 (defun meshgrid-map (fun xx yy)
   "Helper function for a surface plot (surf).
-Map fun to every pair of elements of the subvectors of xx and yy and return the corresponding vector zz.
+Map fun to every pair of elements of the arrays xx and yy and return the corresponding array zz.
 See surf for an example."
-  (map 'vector #'(lambda (x y) (map 'vector fun x y)) xx yy))
+  (let* ((x-len (array-dimension xx 0))
+         (y-len (array-dimension xx 1))
+         (zz (make-array (list x-len y-len))))
+    (dotimes (i (array-total-size xx))
+      (setf (row-major-aref zz i)
+            (funcall fun
+                     (row-major-aref xx i)
+                     (row-major-aref yy i))))
+    zz))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 ;; other utilities

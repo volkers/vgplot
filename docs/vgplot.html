@@ -247,7 +247,7 @@ See the documentation of the plot command for a description of the arguments.</p
 <span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Helper function for a surface plot (surf).
-Map fun to every pair of elements of the subvectors of xx and yy and return the corresponding vector zz.
+Map fun to every pair of elements of the arrays xx and yy and return the corresponding array zz.
 See surf for an example.</pre></div></div>
 <div class="symboldecl">
 <div class="definition">
@@ -256,8 +256,8 @@ See surf for an example.</pre></div></div>
 <span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Helper function for a surface plot (surf).
-Given vectors of X and Y coordinates, return vector XX for a 2-D grid.
-The subvectors of XX are copies of X.
+Given vectors of X and Y coordinates, return array XX for a 2-D grid.
+The columns of XX are copies of X.
 Usually used in combination with meshgrid-y.
 See surf for examples.</pre></div></div>
 <div class="symboldecl">
@@ -267,9 +267,8 @@ See surf for examples.</pre></div></div>
 <span class="symboltype">compiled-function</span></div>
 <div class="documentation">
 <pre>Helper function for a surface plot (surf).
-Given vectors of X and Y coordinates, return vector YY
-for a 2-D grid.
-The corresponding elements of the subvectors of YY are copies of Y.
+Given vectors of X and Y coordinates, return array YY for a 2-D grid.
+The rows of YY are copies of Y.
 Usually used in combination with meshgrid-x.
 See surf for examples.</pre></div></div>
 <div class="symboldecl">
@@ -436,25 +435,25 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 Vals could be: xx yy zz
                xx yy zz label-string
 
-xx, yy and zz are vectors of subverctors usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
-All 3 vectors have to have the same form:
-xx: #( #(x0  x1  x2  ... xn)
-       #(x0  x1  x2  ... xn)
-       ...
-       #(x0  x1  x2  ... xn))
-yy: #( #(y0  y0  y0  ... y0)
-       #(y1  y1  y1  ... y1)
-       ...
-       #(ym  ym  ym  ... ym))
-zz: #( #(z00 z01 z02 ... z0n)
-       #(z10 z11 z12 ... z1n)
-       ...
-       #(zm0 zm1 zm2 ... zmn))
+xx, yy and zz are 2 dimensional arrays usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
+All 3 arrays have to have the same form where the rows follow the x direction and the columns the y.
+xx: #2A((x0  x0  x0  ... x0)
+        (x1  x1  x1  ... x1)
+        ...
+        (xn  xn  xn  ... xn))
+yy: #2A((y0  y1  y2  ... ym)
+        (y0  y1  y2  ... ym)
+        ...
+        (y0  y1  y2  ... ym))
+zz: #2A((z00 z01 z02 ... z0m)
+        (z10 z11 z12 ... z1m)
+        ...
+        (zn0 zn1 zn2 ... znm))
 
 Example 1: Plot some measurement data:
   (let* ((x #(1.0 2.0 3.0))
          (y #(0.0 2.0 4.0 6.0))
-         (zz #(#(2.0 1.5 1.1) #(1.8 1.2 1.2) #(1.7 1.0 1.0) #(1.8 0.9 0.7)))
+         (zz (make-array (list (length x) (length y)) :initial-contents '((0.8 1.5 1.7 2.8) (1.8 1.2 1.2 2.1) (1.7 1.0 1.0 1.9))))
          (xx (vgplot:meshgrid-x x y))
          (yy (vgplot:meshgrid-y x y)))
      (vgplot:surf xx yy zz))
