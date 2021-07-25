@@ -497,6 +497,8 @@ style commands in the label-string work the same as in 'plot'."
 Vals could be: xx yy zz
                xx yy zz label-string
 
+For label-string see documentation of plot. A possible style is ignored because surf requires style 'line'.
+
 xx, yy and zz are 2 dimensional arrays usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
 All 3 arrays have to have the same form where the rows follow the x direction and the columns the y.
 xx: #2A((x0  x0  x0  ... x0)
@@ -555,14 +557,15 @@ Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
                                 (aref yy x-idx y-idx)
                                 (aref zz x-idx y-idx)))
                       (format tmp-file-stream "~%"))))) ; an empty line between the surface lines
-                (tmp-file-list act-plot))
+              (tmp-file-list act-plot))
         (setf plt-cmd (concatenate 'string (if plt-cmd
-                                                     (concatenate 'string plt-cmd ", ")
-                                                     "splot ")
-                                         (destructuring-bind (&key style color title) (parse-label (fourth pl))
-                                           (format nil "\"~A\" with lines ~A title \"~A\" "
-                                                   (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
-        (format-plot *debug* "set grid~%")
+                                               (concatenate 'string plt-cmd ", ")
+                                               "splot ")
+                                   (destructuring-bind(&key style color title) (parse-label (fourth pl))
+                                     (declare (ignore style))
+                                     (format nil "\"~A\" with lines ~A title \"~A\" "
+                                             (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
+      (format-plot *debug* "set grid~%")
       (when *debug*
         (format t  "~A~%" plt-cmd))
       (format (plot-stream act-plot) "~A~%" plt-cmd)
