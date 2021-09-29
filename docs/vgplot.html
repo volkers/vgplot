@@ -432,8 +432,8 @@ Observe, gnuplot doesn't allow interactive mouse commands in multiplot mode.
 <span class="symboltype">function</span></div>
 <div class="documentation">
 <pre>Plot a 3-D surface mesh.
-Vals could be: xx yy zz
-               xx yy zz label-string
+Vals could be: zz [label-string]
+               xx yy zz [label-string]
 
 For label-string see documentation of plot. A possible style is ignored because surf requires style 'line'.
 
@@ -452,7 +452,11 @@ zz: #2A((z00 z01 z02 ... z0m)
         ...
         (zn0 zn1 zn2 ... znm))
 
-Example 1: Plot some measurement data:
+Example 1: Plot some measurement data without providing xx and yy:
+  (let ((zz (make-array (list 3 4) :initial-contents '((0.8 1.5 1.7 2.8) (1.8 1.2 1.2 2.1) (1.7 1.0 1.0 1.9)))))
+     (vgplot:surf zz "r;array plotted without providing xx or yy;"))
+
+Example 2: Plot some measurement data:
   (let* ((x #(1.0 2.0 3.0))
          (y #(0.0 2.0 4.0 6.0))
          (zz (make-array (list (length x) (length y)) :initial-contents '((0.8 1.5 1.7 2.8) (1.8 1.2 1.2 2.1) (1.7 1.0 1.0 1.9))))
@@ -460,7 +464,7 @@ Example 1: Plot some measurement data:
          (yy (vgplot:meshgrid-y x y)))
      (vgplot:surf xx yy zz))
 
-Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
+Example 3: Plot a function z = f(x,y), e.g. the sombrero function:
   (let* ((eps double-float-epsilon)
          (fun #'(lambda (x y) (/ (sin (sqrt (+ (* x x) (* y y) eps))) (sqrt (+ (* x x) (* y y) eps)))))
          (x (vgplot:range -8 8 0.2))

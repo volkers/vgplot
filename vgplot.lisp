@@ -494,8 +494,8 @@ style commands in the label-string work the same as in 'plot'."
     (read-n-print-no-hang (plot-stream act-plot)))
   (defun surf (&rest vals)
     "Plot a 3-D surface mesh.
-Vals could be: xx yy zz
-               xx yy zz label-string
+Vals could be: zz [label-string]
+               xx yy zz [label-string]
 
 For label-string see documentation of plot. A possible style is ignored because surf requires style 'line'.
 
@@ -514,7 +514,11 @@ zz: #2A((z00 z01 z02 ... z0m)
         ...
         (zn0 zn1 zn2 ... znm))
 
-Example 1: Plot some measurement data:
+Example 1: Plot some measurement data without providing xx and yy:
+  (let ((zz (make-array (list 3 4) :initial-contents '((0.8 1.5 1.7 2.8) (1.8 1.2 1.2 2.1) (1.7 1.0 1.0 1.9)))))
+     (vgplot:surf zz \"r;array plotted without providing xx or yy;\"))
+
+Example 2: Plot some measurement data:
   (let* ((x #(1.0 2.0 3.0))
          (y #(0.0 2.0 4.0 6.0))
          (zz (make-array (list (length x) (length y)) :initial-contents '((0.8 1.5 1.7 2.8) (1.8 1.2 1.2 2.1) (1.7 1.0 1.0 1.9))))
@@ -522,7 +526,7 @@ Example 1: Plot some measurement data:
          (yy (vgplot:meshgrid-y x y)))
      (vgplot:surf xx yy zz))
 
-Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
+Example 3: Plot a function z = f(x,y), e.g. the sombrero function:
   (let* ((eps double-float-epsilon)
          (fun #'(lambda (x y) (/ (sin (sqrt (+ (* x x) (* y y) eps))) (sqrt (+ (* x x) (* y y) eps)))))
          (x (vgplot:range -8 8 0.2))
@@ -535,43 +539,57 @@ Example 2: Plot a function z = f(x,y), e.g. the sombrero function:
     (vgplot:format-plot nil \"set pm3d\")
     (vgplot:replot))
 "
-    (format-plot *debug* "set nologscale")
-    (if act-plot
-        (unless (multiplot-p act-plot)
-          (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
-        (setf act-plot (make-plot)))
-    (let ((val-l (parse-vals-3d vals))
-          (plt-cmd))
-      (loop for pl in val-l do
-        (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
-                (let* ((xx (first pl))
-                       (yy (second pl))
-                       (zz (third pl))
-                       (x-len (array-dimension xx 0))
-                       (y-len (array-dimension xx 1)))
-                  (dotimes (y-idx y-len)
-                    (progn
-                      (dotimes (x-idx x-len)
-                        (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE ~,,,,,,'eE~%"
-                                (aref xx x-idx y-idx)
-                                (aref yy x-idx y-idx)
-                                (aref zz x-idx y-idx)))
-                      (format tmp-file-stream "~%"))))) ; an empty line between the surface lines
-              (tmp-file-list act-plot))
-        (setf plt-cmd (concatenate 'string (if plt-cmd
-                                               (concatenate 'string plt-cmd ", ")
-                                               "splot ")
-                                   (destructuring-bind(&key style color title) (parse-label (fourth pl))
-                                     (declare (ignore style))
-                                     (format nil "\"~A\" with lines ~A title \"~A\" "
-                                             (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
-      (format-plot *debug* "set grid~%")
-      (when *debug*
-        (format t  "~A~%" plt-cmd))
-      (format (plot-stream act-plot) "~A~%" plt-cmd)
-      (force-output (plot-stream act-plot))
-      (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
-    (read-n-print-no-hang (plot-stream act-plot)))
+    ;; handle plotting without povided xx and yy
+    (if (or (= 1 (length vals))
+            (and (= 2 (length vals)) (stringp (second vals))))
+        ;; handle plotting without povided xx and yy
+        (let* ((zz (first vals))
+               (x (range (array-dimension zz 0)))
+               (y (range (array-dimension zz 1)))
+               (xx (meshgrid-x x y))
+               (yy (meshgrid-y x y)))
+          (if (= 1 (length vals))
+              (surf xx yy zz)
+              (surf xx yy zz (second vals))))
+        ;; handle xx yy zz  potting
+        (progn
+          (format-plot *debug* "set nologscale")
+          (if act-plot
+              (unless (multiplot-p act-plot)
+                (setf (tmp-file-list act-plot) (del-tmp-files (tmp-file-list act-plot))))
+              (setf act-plot (make-plot)))
+          (let ((val-l (parse-vals-3d vals))
+                (plt-cmd))
+            (loop for pl in val-l do
+              (push (with-output-to-temporary-file (tmp-file-stream :template "vgplot-%.dat")
+                      (let* ((xx (first pl))
+                             (yy (second pl))
+                             (zz (third pl))
+                             (x-len (array-dimension xx 0))
+                             (y-len (array-dimension xx 1)))
+                        (dotimes (y-idx y-len)
+                          (progn
+                            (dotimes (x-idx x-len)
+                              (format tmp-file-stream "~,,,,,,'eE ~,,,,,,'eE ~,,,,,,'eE~%"
+                                      (aref xx x-idx y-idx)
+                                      (aref yy x-idx y-idx)
+                                      (aref zz x-idx y-idx)))
+                            (format tmp-file-stream "~%"))))) ; an empty line between the surface lines
+                    (tmp-file-list act-plot))
+              (setf plt-cmd (concatenate 'string (if plt-cmd
+                                                     (concatenate 'string plt-cmd ", ")
+                                                     "splot ")
+                                         (destructuring-bind(&key style color title) (parse-label (fourth pl))
+                                           (declare (ignore style))
+                                           (format nil "\"~A\" with lines ~A title \"~A\" "
+                                                   (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
+            (format-plot *debug* "set grid~%")
+            (when *debug*
+              (format t  "~A~%" plt-cmd))
+            (format (plot-stream act-plot) "~A~%" plt-cmd)
+            (force-output (plot-stream act-plot))
+            (add-del-tmp-files-to-exit-hook (tmp-file-list act-plot)))
+          (read-n-print-no-hang (plot-stream act-plot)))))
   (defun print-plot (filename &key terminal)
     "Print the actual plot into filename (a pathname).
 Use the (optional) terminal or if not provided,
