@@ -139,7 +139,7 @@ Create x if not existing."
     (vals (list (list (range (length (first vals))) (first vals) "")))
     (t nil)))
 
-(defun parse-label (lbl)
+(defun parse-label-string (lbl)
   "Parse label string e.g. \"-k;label;\" and return key list (list :style style :color color :title title)."
   (let ((style "lines")
         (color)
@@ -176,6 +176,17 @@ Create x if not existing."
               (#\w (setf color "white"))
               (#\# (setf rgb "#")))))) ; use rgb string
     (list :style style :color color :title title)))
+
+(defun parse-label (lbl)
+  "Parse label string e.g. \"+r;label;\" and return style command, e.g.: \"with points linecolor rgb \"red\" title \"label\"\" "
+  (destructuring-bind (&key style color title) (parse-label-string lbl)
+    (format nil "with ~A ~A title \"~A\" " style (get-color-cmd color) title)))
+
+(defun parse-label-with-lines (lbl)
+  "Parse label string e.g. \"+r;label;\", force to 'with lines' and return style command, e.g.: \"with lines linecolor rgb \"red\" title \"label\"\" "
+  (destructuring-bind (&key style color title) (parse-label-string lbl)
+    (declare (ignore style))
+    (format nil "with lines ~A title \"~A\" " (get-color-cmd color) title)))
 
 (defun get-color-cmd (color)
   "Return color command string or empty string"
@@ -414,9 +425,7 @@ print also response to stdout if print? is true"
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "plot ")
-                                      (destructuring-bind (&key style color title) (parse-label  (third pl))
-                                        (format nil "\"~A\" with ~A ~A title \"~A\" "
-                                              (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
+                                      (format nil "\"~A\" ~A "(first (tmp-file-list act-plot)) (parse-label (third pl))))))
       (format-plot *debug* "set grid~%")
       (when *debug*
         (format t  "~A~%" plt-cmd))
@@ -482,9 +491,7 @@ style commands in the label-string work the same as in 'plot'."
            (setf plt-cmd (concatenate 'string (if plt-cmd
                                                   (concatenate 'string plt-cmd ", ")
                                                   "splot ")
-                                      (destructuring-bind (&key style color title) (parse-label (fourth pl))
-                                        (format nil "\"~A\" with ~A ~A title \"~A\" "
-                                                (first (tmp-file-list act-plot)) style (get-color-cmd color) title)))))
+                                      (format nil "\"~A\" ~A "(first (tmp-file-list act-plot)) (parse-label (fourth pl))))))
       (format-plot *debug* "set grid~%")
       (when *debug*
         (format t  "~A~%" plt-cmd))
@@ -579,10 +586,7 @@ Example 3: Plot a function z = f(x,y), e.g. the sombrero function:
               (setf plt-cmd (concatenate 'string (if plt-cmd
                                                      (concatenate 'string plt-cmd ", ")
                                                      "splot ")
-                                         (destructuring-bind(&key style color title) (parse-label (fourth pl))
-                                           (declare (ignore style))
-                                           (format nil "\"~A\" with lines ~A title \"~A\" "
-                                                   (first (tmp-file-list act-plot)) (get-color-cmd color) title)))))
+                                         (format nil "\"~A\" ~A "(first (tmp-file-list act-plot)) (parse-label-with-lines (fourth pl))))))
             (format-plot *debug* "set grid~%")
             (when *debug*
               (format t  "~A~%" plt-cmd))

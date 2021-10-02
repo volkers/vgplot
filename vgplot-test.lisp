@@ -54,35 +54,35 @@
                  (vgplot:stairs-no-plot #(1 3) '(17.0 -1.0))))
 
 (define-test test-parse-label
-  (assert-equalp (list :style "lines" :color nil :title "")
+  (assert-equalp "with lines  title \"\" "
                  (vgplot::parse-label ""))
-  (assert-equalp (list :style "lines" :color nil :title "")
+  (assert-equalp "with lines  title \"\" "
                  (vgplot::parse-label ";"))
-  (assert-equalp (list :style "lines" :color nil :title "")
+  (assert-equalp "with lines  title \"\" "
                  (vgplot::parse-label ";;"))
-  (assert-equalp (list :style "lines" :color nil :title "title")
+  (assert-equalp "with lines  title \"title\" "
                  (vgplot::parse-label ";title;"))
-  (assert-equalp (list :style "lines" :color nil :title "title")
+  (assert-equalp "with lines  title \"title\" "
                  (vgplot::parse-label ";title"))
-  (assert-equalp (list :style "lines" :color nil :title "title")
+  (assert-equalp "with lines  title \"title\" "
                  (vgplot::parse-label ";title;add-styles"))
-  (assert-equalp (list :style "lines" :color "red" :title "title")
+  (assert-equalp "with lines  linecolor rgb \"red\" title \"title\" "
                  (vgplot::parse-label "-r;title;"))
-  (assert-equalp (list :style "points" :color "green" :title "title")
+  (assert-equalp "with points  linecolor rgb \"green\" title \"title\" "
                  (vgplot::parse-label "g+;title;"))
-  (assert-equalp (list :style "lines dt \". . \"" :color "blue" :title "title")
+  (assert-equalp "with lines dt \". . \"  linecolor rgb \"blue\" title \"title\" "
                  (vgplot::parse-label ":b;title;"))
-  (assert-equalp (list :style "dots" :color "cyan" :title "title")
+  (assert-equalp "with dots  linecolor rgb \"cyan\" title \"title\" "
                  (vgplot::parse-label ".c;title;"))
-  (assert-equalp (list :style "points" :color "black" :title "title")
+  (assert-equalp "with points  linecolor rgb \"black\" title \"title\" "
                  (vgplot::parse-label "+k;title;"))
-  (assert-equalp (list :style "circles" :color "yellow" :title "title")
+  (assert-equalp "with circles  linecolor rgb \"yellow\" title \"title\" "
                  (vgplot::parse-label "oy;title;"))
-  (assert-equalp (list :style "circles" :color "magenta" :title "title")
+  (assert-equalp "with circles  linecolor rgb \"magenta\" title \"title\" "
                  (vgplot::parse-label "om;title;"))
-  (assert-equalp (list :style "dots" :color "white" :title "title")
+  (assert-equalp "with dots  linecolor rgb \"white\" title \"title\" "
                  (vgplot::parse-label ".w;title;"))
-  (assert-equalp (list :style "dots" :color "#112233" :title "title")
+  (assert-equalp "with dots  linecolor rgb \"#112233\" title \"title\" "
                  (vgplot::parse-label ".#112233;title;"))
   )
 
