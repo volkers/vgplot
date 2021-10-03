@@ -192,6 +192,12 @@ If add-styles isn't empty it will replace all styles and color strings."
     (declare (ignore style))
     (format nil "with lines ~A title '~A' " color title)))
 
+(defun get-color-cmd (color)
+  "Return color command string or empty string"
+  (if color
+      (format nil " linecolor rgb \"~A\"" color)
+      ""))
+
 (defun get-tc-rgb-cmd (color-name)
   "Return textcolor rgb command string for color name or unchanged color-string when not found"
   (cond
