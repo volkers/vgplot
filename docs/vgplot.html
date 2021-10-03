@@ -294,7 +294,10 @@ vals could be: y                  plot y over its index
 label:
 A simple label in form of "text" is printed directly.
 
-A label with added style commands: label in form "styles;text;":
+A label with style commands: label in form "styles;text;add-styles":
+
+In the ordinary case add-styles will be empty.
+
 styles can be (combinations possible):
    "-" lines
    ":" dotted lines
@@ -314,6 +317,17 @@ styles can be (combinations possible):
 e.g.:
    (plot x y "r+;red values;") plots y = f(x) as red points with the
                                  label "red values"
+
+If add-styles is not empty, the string in add-styles is send unmodyfied to gnuplot, other styles and colors are skipped.
+This is useful to set more complicated styles, e.g.:
+
+   (plot x y ";use of additional styles;with linespoints pt 7 ps 2 lc 'red'")
+                                 plots y = f(x) as lines with red points, pointsize 2 with the
+                                 label "use of additional styles"
+
+To use a backslash in add-styles you have to quote it, e.g.:
+
+   (plot x y ";;with points pt '\U+2299'")
 </pre></div></div>
 <div class="symboldecl">
 <div class="definition">
