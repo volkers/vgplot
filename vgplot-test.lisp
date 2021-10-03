@@ -54,36 +54,38 @@
                  (vgplot:stairs-no-plot #(1 3) '(17.0 -1.0))))
 
 (define-test test-parse-label
-  (assert-equalp "with lines  title \"\" "
+  (assert-equalp "with lines  title '' "
                  (vgplot::parse-label ""))
-  (assert-equalp "with lines  title \"\" "
+  (assert-equalp "with lines  title '' "
                  (vgplot::parse-label ";"))
-  (assert-equalp "with lines  title \"\" "
+  (assert-equalp "with lines  title '' "
                  (vgplot::parse-label ";;"))
-  (assert-equalp "with lines  title \"title\" "
+  (assert-equalp "with lines  title 'title' "
                  (vgplot::parse-label ";title;"))
-  (assert-equalp "with lines  title \"title\" "
+  (assert-equalp "with lines  title 'title' "
                  (vgplot::parse-label ";title"))
-  (assert-equalp "with lines  title \"title\" "
+  (assert-equalp "with lines  title 'title' "
                  (vgplot::parse-label ";title;add-styles"))
-  (assert-equalp "with lines  linecolor rgb \"red\" title \"title\" "
+  (assert-equalp "with lines linecolor rgb 'red' title 'title' "
                  (vgplot::parse-label "-r;title;"))
-  (assert-equalp "with points  linecolor rgb \"green\" title \"title\" "
+  (assert-equalp "with points linecolor rgb 'green' title 'title' "
                  (vgplot::parse-label "g+;title;"))
-  (assert-equalp "with lines dt \". . \"  linecolor rgb \"blue\" title \"title\" "
+  (assert-equalp "with lines dt '. . ' linecolor rgb 'blue' title 'title' "
                  (vgplot::parse-label ":b;title;"))
-  (assert-equalp "with dots  linecolor rgb \"cyan\" title \"title\" "
+  (assert-equalp "with dots linecolor rgb 'cyan' title 'title' "
                  (vgplot::parse-label ".c;title;"))
-  (assert-equalp "with points  linecolor rgb \"black\" title \"title\" "
+  (assert-equalp "with points linecolor rgb 'black' title 'title' "
                  (vgplot::parse-label "+k;title;"))
-  (assert-equalp "with circles  linecolor rgb \"yellow\" title \"title\" "
+  (assert-equalp "with circles linecolor rgb 'yellow' title 'title' "
                  (vgplot::parse-label "oy;title;"))
-  (assert-equalp "with circles  linecolor rgb \"magenta\" title \"title\" "
+  (assert-equalp "with circles linecolor rgb 'magenta' title 'title' "
                  (vgplot::parse-label "om;title;"))
-  (assert-equalp "with dots  linecolor rgb \"white\" title \"title\" "
+  (assert-equalp "with dots linecolor rgb 'white' title 'title' "
                  (vgplot::parse-label ".w;title;"))
-  (assert-equalp "with dots  linecolor rgb \"#112233\" title \"title\" "
+  (assert-equalp "with dots linecolor rgb '#112233' title 'title' "
                  (vgplot::parse-label ".#112233;title;"))
+  (assert-equalp "with points linecolor rgb '#112233' title 'title' "
+                 (vgplot::parse-label "#112233+;title;"))
   )
 
 (defun run ()

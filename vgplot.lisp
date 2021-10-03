@@ -141,8 +141,8 @@ Create x if not existing."
 
 (defun parse-label-string (lbl)
   "Parse label string e.g. \"-k;label;\" and return key list (list :style style :color color :title title)."
-  (let ((style "lines")
-        (color)
+  (let ((style "with lines")
+        (color "")
         (rgb)
         (title "")
         (start-title (or (search ";" lbl) -1)) ;; -1 because subseq jumps over first ;
@@ -156,43 +156,36 @@ Create x if not existing."
         (if rgb
             (progn ;; process rgb string, e.g. "#ff12ff", i.e. 6 hex digits with heading #
               (setf rgb (concatenate 'string rgb (string c)))
-              (format nil "~a~%" rgb)
               (when (= 7 (length rgb))
-                (setf color rgb)
+                (setf color (format nil "linecolor rgb '~A'" rgb))
                 (setf rgb nil)))
             (ecase c
-              (#\- (setf style "lines"))
-              (#\: (setf style "lines dt \". . \""))
-              (#\. (setf style "dots"))
-              (#\+ (setf style "points"))
-              (#\o (setf style "circles"))
-              (#\r (setf color "red"))
-              (#\g (setf color "green"))
-              (#\b (setf color "blue"))
-              (#\c (setf color "cyan"))
-              (#\k (setf color "black"))
-              (#\y (setf color "yellow"))
-              (#\m (setf color "magenta"))
-              (#\w (setf color "white"))
+              (#\- (setf style "with lines"))
+              (#\: (setf style "with lines dt '. . '"))
+              (#\. (setf style "with dots"))
+              (#\+ (setf style "with points"))
+              (#\o (setf style "with circles"))
+              (#\r (setf color "linecolor rgb 'red'"))
+              (#\g (setf color "linecolor rgb 'green'"))
+              (#\b (setf color "linecolor rgb 'blue'"))
+              (#\c (setf color "linecolor rgb 'cyan'"))
+              (#\k (setf color "linecolor rgb 'black'"))
+              (#\y (setf color "linecolor rgb 'yellow'"))
+              (#\m (setf color "linecolor rgb 'magenta'"))
+              (#\w (setf color "linecolor rgb 'white'"))
               (#\# (setf rgb "#")))))) ; use rgb string
     (list :style style :color color :title title)))
 
 (defun parse-label (lbl)
   "Parse label string e.g. \"+r;label;\" and return style command, e.g.: \"with points linecolor rgb \"red\" title \"label\"\" "
   (destructuring-bind (&key style color title) (parse-label-string lbl)
-    (format nil "with ~A ~A title \"~A\" " style (get-color-cmd color) title)))
+    (format nil "~A ~A title '~A' " style color title)))
 
 (defun parse-label-with-lines (lbl)
   "Parse label string e.g. \"+r;label;\", force to 'with lines' and return style command, e.g.: \"with lines linecolor rgb \"red\" title \"label\"\" "
   (destructuring-bind (&key style color title) (parse-label-string lbl)
     (declare (ignore style))
-    (format nil "with lines ~A title \"~A\" " (get-color-cmd color) title)))
-
-(defun get-color-cmd (color)
-  "Return color command string or empty string"
-  (if color
-      (format nil " linecolor rgb \"~A\"" color)
-      ""))
+    (format nil "with lines ~A title '~A' " color title)))
 
 (defun get-tc-rgb-cmd (color-name)
   "Return textcolor rgb command string for color name or unchanged color-string when not found"
