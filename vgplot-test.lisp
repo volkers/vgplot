@@ -64,8 +64,10 @@
                  (vgplot::parse-label ";title;"))
   (assert-equalp "with lines  title 'title' "
                  (vgplot::parse-label ";title"))
-  (assert-equalp "with lines  title 'title' "
+  (assert-equalp "add-styles  title 'title' "
                  (vgplot::parse-label ";title;add-styles"))
+  (assert-equalp "add-styles  title 'title' "
+                 (vgplot::parse-label "+b;title;add-styles"))
   (assert-equalp "with lines linecolor rgb 'red' title 'title' "
                  (vgplot::parse-label "-r;title;"))
   (assert-equalp "with points linecolor rgb 'green' title 'title' "

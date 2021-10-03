@@ -140,7 +140,8 @@ Create x if not existing."
     (t nil)))
 
 (defun parse-label-string (lbl)
-  "Parse label string e.g. \"-k;label;\" and return key list (list :style style :color color :title title)."
+  "Parse label string e.g. \"-k;label;add-styles\" and return key list (list :style style :color color :title title).
+If add-styles isn't empty it will replace all styles and color strings."
   (let ((style "with lines")
         (color "")
         (rgb)
@@ -151,29 +152,33 @@ Create x if not existing."
       ;; only one semicolon found, use the part after the first one as title
       (setf end-title (length lbl)))
     (setf title (subseq lbl (1+ start-title) end-title))
-    (when (> start-title 0)
-      (loop for c across (subseq lbl 0 start-title) do
-        (if rgb
-            (progn ;; process rgb string, e.g. "#ff12ff", i.e. 6 hex digits with heading #
-              (setf rgb (concatenate 'string rgb (string c)))
-              (when (= 7 (length rgb))
-                (setf color (format nil "linecolor rgb '~A'" rgb))
-                (setf rgb nil)))
-            (ecase c
-              (#\- (setf style "with lines"))
-              (#\: (setf style "with lines dt '. . '"))
-              (#\. (setf style "with dots"))
-              (#\+ (setf style "with points"))
-              (#\o (setf style "with circles"))
-              (#\r (setf color "linecolor rgb 'red'"))
-              (#\g (setf color "linecolor rgb 'green'"))
-              (#\b (setf color "linecolor rgb 'blue'"))
-              (#\c (setf color "linecolor rgb 'cyan'"))
-              (#\k (setf color "linecolor rgb 'black'"))
-              (#\y (setf color "linecolor rgb 'yellow'"))
-              (#\m (setf color "linecolor rgb 'magenta'"))
-              (#\w (setf color "linecolor rgb 'white'"))
-              (#\# (setf rgb "#")))))) ; use rgb string
+    (if (< (1+ end-title) (length lbl))
+        ;; there is something after the second ; this is used directly as the style, all other styles skipped
+        (setf style (subseq lbl (1+ end-title)))
+        ;; nothing after second ; -> ordinary parsing of styles and colors
+        (when (> start-title 0)
+          (loop for c across (subseq lbl 0 start-title) do
+            (if rgb
+                (progn ;; process rgb string, e.g. "#ff12ff", i.e. 6 hex digits with heading #
+                  (setf rgb (concatenate 'string rgb (string c)))
+                  (when (= 7 (length rgb))
+                    (setf color (format nil "linecolor rgb '~A'" rgb))
+                    (setf rgb nil)))
+                (ecase c
+                  (#\- (setf style "with lines"))
+                  (#\: (setf style "with lines dt '. . '"))
+                  (#\. (setf style "with dots"))
+                  (#\+ (setf style "with points"))
+                  (#\o (setf style "with circles"))
+                  (#\r (setf color "linecolor rgb 'red'"))
+                  (#\g (setf color "linecolor rgb 'green'"))
+                  (#\b (setf color "linecolor rgb 'blue'"))
+                  (#\c (setf color "linecolor rgb 'cyan'"))
+                  (#\k (setf color "linecolor rgb 'black'"))
+                  (#\y (setf color "linecolor rgb 'yellow'"))
+                  (#\m (setf color "linecolor rgb 'magenta'"))
+                  (#\w (setf color "linecolor rgb 'white'"))
+                  (#\# (setf rgb "#"))))))) ; use rgb string
     (list :style style :color color :title title)))
 
 (defun parse-label (lbl)
