@@ -139,8 +139,8 @@ Create x if not existing."
     (vals (list (list (range (length (first vals))) (first vals) "")))
     (t nil)))
 
-(defun parse-label-string (lbl)
-  "Parse label string e.g. \"-k;label;add-styles\" and return key list (list :style style :color color :title title).
+(defun parse-label (lbl)
+  "Parse label string e.g. \"-k;label;add-styles\" and return style command, e.g.: \"with points linecolor rgb 'red' title 'label'\".
 If add-styles isn't empty it will replace all styles and color strings."
   (let ((style "with lines")
         (color "")
@@ -179,18 +179,7 @@ If add-styles isn't empty it will replace all styles and color strings."
                   (#\m (setf color "linecolor rgb 'magenta'"))
                   (#\w (setf color "linecolor rgb 'white'"))
                   (#\# (setf rgb "#"))))))) ; use rgb string
-    (list :style style :color color :title title)))
-
-(defun parse-label (lbl)
-  "Parse label string e.g. \"+r;label;\" and return style command, e.g.: \"with points linecolor rgb \"red\" title \"label\"\" "
-  (destructuring-bind (&key style color title) (parse-label-string lbl)
     (format nil "~A ~A title '~A' " style color title)))
-
-(defun parse-label-with-lines (lbl)
-  "Parse label string e.g. \"+r;label;\", force to 'with lines' and return style command, e.g.: \"with lines linecolor rgb \"red\" title \"label\"\" "
-  (destructuring-bind (&key style color title) (parse-label-string lbl)
-    (declare (ignore style))
-    (format nil "with lines ~A title '~A' " color title)))
 
 (defun get-color-cmd (color)
   "Return color command string or empty string"
@@ -522,7 +511,7 @@ style commands in the label-string work the same as in 'plot'."
 Vals could be: zz [label-string]
                xx yy zz [label-string]
 
-For label-string see documentation of plot. A possible style is ignored because surf requires style 'line'.
+For label-string see documentation of plot.
 
 xx, yy and zz are 2 dimensional arrays usually produced by meshgrid-x, meshgrid-y and meshgrid-map.
 All 3 arrays have to have the same form where the rows follow the x direction and the columns the y.
@@ -604,7 +593,7 @@ Example 3: Plot a function z = f(x,y), e.g. the sombrero function:
               (setf plt-cmd (concatenate 'string (if plt-cmd
                                                      (concatenate 'string plt-cmd ", ")
                                                      "splot ")
-                                         (format nil "\"~A\" ~A "(first (tmp-file-list act-plot)) (parse-label-with-lines (fourth pl))))))
+                                         (format nil "\"~A\" ~A "(first (tmp-file-list act-plot)) (parse-label (fourth pl))))))
             (format-plot *debug* "set grid~%")
             (when *debug*
               (format t  "~A~%" plt-cmd))
