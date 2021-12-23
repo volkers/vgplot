@@ -200,22 +200,32 @@ If add-styles isn't empty it will replace all styles and color strings."
     ((equal color-name "white") "tc rgb '#ffffff'")
     (t color-name))) ; unchanged string if not found
 
-(defun parse-floats (s sep)
-  "Parse string s and return the found numbers separated by separator"
-  (let ((c-list)
-        (r-list))
-    (loop for c across s do
-         (cond
-           ((eql c #\# ) (loop-finish)) ; rest of line is comment
-           ((eql c #\ )) ; ignore space
-           ((eql c #\	)) ; ignore tab
-           ((eql c sep) (progn
-                          (push (read-from-string (nreverse (coerce c-list 'string))) r-list)
-                          (setf c-list nil)))
-           (t (push c c-list))))
-    ;; add also number after the last sep:
-    (push (read-from-string (nreverse (coerce c-list 'string)) nil) r-list)
-    (nreverse r-list)))
+
+(defun parse-floats (line sep)
+  "Parse string line and return the found numbers separated by separator or whitespace when
+separator is just t"
+  (if (characterp sep)
+      ;; separator is a character
+      (let ((c-list)
+            (r-list))
+        (loop for c across line do
+          (cond
+            ((eql c #\# ) (loop-finish)) ; rest of line is comment
+            ((eql c #\ )) ; ignore space
+            ((eql c #\	)) ; ignore tab
+            ((eql c sep) (progn
+                           (push (read-from-string (nreverse (coerce c-list 'string))) r-list)
+                           (setf c-list nil)))
+            (t (push c c-list))))
+        ;; add also number after the last sep:
+        (push (read-from-string (nreverse (coerce c-list 'string)) nil) r-list)
+        (nreverse r-list))
+      ;; separator is only t:
+      (with-input-from-string (s line)
+        (loop
+          :for num := (read s nil nil)
+          :while num
+          :collect num))))
 
 (defun v-format (format-string v)
   "Convert members of sequence v to strings using format-string and
@@ -276,7 +286,6 @@ could be a variable number of spaces, tabs or the optional separator"
                       ((eql c #\# ) (return))
                       ((eql c (or separator #\	)) (setf sep t))
                       ((eql c #\	) (setf sep t))
-                      ((eql c #\ ) (setf sep t))
                       (t (when sep
                            (incf num)
                            (setf sep nil)))))

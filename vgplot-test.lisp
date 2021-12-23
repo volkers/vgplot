@@ -38,7 +38,13 @@
   (assert-equal 2 (vgplot::count-data-columns "1.7d179, 87654321" #\,))
   (assert-equal 20 (vgplot::count-data-columns "1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0" #\,))
   (assert-equal 2 (vgplot::count-data-columns "		1.7e179 ; 87654321 # comment" #\;))
-)
+  )
+
+(define-test test-parse-floats
+  (assert-equalp '(1 2 3) (vgplot::parse-floats "1, 2, 3" #\,))
+  (assert-equalp '(3.0d20 2 3) (vgplot::parse-floats "30.0d19; 2; 3" #\;))
+  (assert-equalp '(1 2 3) (vgplot::parse-floats "1 2		3" t))
+  (assert-equalp '(1.3254 2 300000.0) (vgplot::parse-floats "1.3254 2  	3e5" t)))
 
 (define-test test-stairs-no-plot
   (assert-equalp (list #(0) #(1)) (vgplot:stairs-no-plot #(1)))
