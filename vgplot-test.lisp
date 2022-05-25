@@ -24,6 +24,7 @@
 
 (define-test test-get-separator
   (assert-equal t (vgplot::get-separator "30	4	87"))
+  (assert-equal t (vgplot::get-separator " 1499  -938  -535    31"))
   (assert-equal t (vgplot::get-separator "1.9e3 4 87"))
   (assert-equal nil (vgplot::get-separator " # comment"))
   (assert-equal nil (vgplot::get-separator ""))
@@ -34,7 +35,8 @@
 (define-test test-count-data-columns
   (assert-equal 0 (vgplot::count-data-columns ""))
   (assert-equal 1 (vgplot::count-data-columns "17"))
-  (assert-equal 2 (vgplot::count-data-columns "17	987654321"))
+  (assert-equal 2 (vgplot::count-data-columns "17	987654321")) ; TAB used
+  (assert-equal 4 (vgplot::count-data-columns " 1499  -938  -535    31"))
   (assert-equal 2 (vgplot::count-data-columns "1.7d179, 87654321" #\,))
   (assert-equal 20 (vgplot::count-data-columns "1,2,3,4,5,6,7,8,9,0,1,2,3,4,5,6,7,8,9,0" #\,))
   (assert-equal 2 (vgplot::count-data-columns "		1.7e179 ; 87654321 # comment" #\;))
@@ -44,6 +46,7 @@
   (assert-equalp '(1 2 3) (vgplot::parse-floats "1, 2, 3" #\,))
   (assert-equalp '(3.0d20 2 3) (vgplot::parse-floats "30.0d19; 2; 3" #\;))
   (assert-equalp '(1 2 3) (vgplot::parse-floats "1 2		3" t))
+  (assert-equalp '(1499 -938 -535 31) (vgplot::parse-floats " 1499  -938  -535    31" t))
   (assert-equalp '(1.3254 2 300000.0) (vgplot::parse-floats "1.3254 2  	3e5" t)))
 
 (define-test test-stairs-no-plot

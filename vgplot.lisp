@@ -278,14 +278,14 @@ nil comment line \(or empty line)"
         nil))) ; comment-only line
 
 (defun count-data-columns (s &optional (separator))
-  "Count data columns in strings like \"1 2 3 # comment\", seperators
+  "Count data columns in strings like \"1 2 3 # comment\", separators
 could be a variable number of spaces, tabs or the optional separator"
   (let ((sep t) (num 0))
                (loop for c across s do
                     (cond
                       ((eql c #\# ) (return))
-                      ((eql c (or separator #\	)) (setf sep t))
-                      ((eql c #\	) (setf sep t))
+                      ((eql c (or separator #\Tab)) (setf sep t))
+                      ((eql c #\Space) (setf sep t))
                       (t (when sep
                            (incf num)
                            (setf sep nil)))))
