@@ -10,11 +10,10 @@
                (:file "vgplot")
                (:file "demo")))
 
-(asdf:defsystem :vgplot-test
+(asdf:defsystem :vgplot/test
   :serial t
   :description "Test environment for vgplot"
   :author "Volker Sarodnick"
   :license "GPL"
   :depends-on (:vgplot :lisp-unit)
-  :components ((:file "package-test")
-               (:file "vgplot-test")))
+  :components ((:file "test")))

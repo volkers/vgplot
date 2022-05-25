@@ -1,4 +1,4 @@
-;;;; vgplot-test.lisp
+;;;; test.lisp
 
 #|
     This is the test environment for vgplot, an interface to the gnuplot utility.
@@ -18,7 +18,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 |#
 
-(in-package #:vgplot-test)
+(in-package :cl-user)
+
+(defpackage :vgplot/test
+  (:use :cl :lisp-unit :vgplot)
+  (:export :run))
+
+
+(in-package #:vgplot/test)
 
 (setq lisp-unit:*print-failures* t)
 
@@ -100,4 +107,4 @@
   )
 
 (defun run ()
-  (lisp-unit:run-tests :all :vgplot-test))
+  (lisp-unit:run-tests :all :vgplot/test))
