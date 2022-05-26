@@ -26,7 +26,7 @@ and see API documentation in docs/vgplot.html or on http://volkers.github.io/vgp
 
 ## License
 
-Copyright (C) 2013 - 2021 Volker Sarodnick
+Copyright (C) 2013 - 2022 Volker Sarodnick
 
 mail: (remove #\\y (subseq \"avoidspamyvolykerysyar@gymyx.net\" 9))
 
